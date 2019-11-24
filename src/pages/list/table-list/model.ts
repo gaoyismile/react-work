@@ -40,7 +40,6 @@ const Model: ModelType = {
   effects: {
     *fetch({ payload }, { call, put }) {
       const response = yield call(queryRule, payload);
-      console.log("查询response",response)
       yield put({
         type: 'save',
         payload: response,

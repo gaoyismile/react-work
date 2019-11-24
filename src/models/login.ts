@@ -43,22 +43,16 @@ const Model: LoginModelType = {
       // Login successfully
       if (response.status === 'ok') {
         const urlParams = new URL(window.location.href);
-        console.log("成功后的url:",urlParams)
         const params = getPageQuery();
-        console.log("跳转地址:",params)
         let { redirect } = params as { redirect: string };
-        console.log("判断redirect,",redirect)
         if (redirect) {
           const redirectUrlParams = new URL(redirect);
-          console.log(redirectUrlParams.origin,urlParams.origin);
           if (redirectUrlParams.origin === urlParams.origin) {
             redirect = redirect.substr(urlParams.origin.length);
             if (redirect.match(/^\/.*#/)) {
               redirect = redirect.substr(redirect.indexOf('#') + 1);
             }
-            console.log("redirect重定向",redirect)
           } else {
-            console.log("没权限,重定向到登录页");
             window.location.href = '/';
             return;
           }

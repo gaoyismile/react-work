@@ -32,7 +32,6 @@ function initTotalList(columns: StandardTableColumnProps[]) {
       totalList.push({ ...column, total: 0 });
     }
   });
-  console.log("总totalList:",totalList)
   return totalList;
 }
 
