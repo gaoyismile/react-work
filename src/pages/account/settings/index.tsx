@@ -46,30 +46,30 @@ class Settings extends Component<
   constructor(props: SettingsProps) {
     super(props);
     const menuMap = {
-      workDesc: <FormattedMessage id="工作概述" defaultMessage="工作概述" />,
+      workDesc: <FormattedMessage id="app.settings.workDesc" defaultMessage="app.settings.workDesc" />,
       workOrder: (
-        <FormattedMessage id="工作指令" defaultMessage="工作指令" />
+        <FormattedMessage id="app.settings.workOrder" defaultMessage="app.settings.workOrder" />
       ),
       isolationSecurity: (
-        <FormattedMessage id="隔离安措要求" defaultMessage="隔离安措要求" />
+        <FormattedMessage id="app.settings.isolationSecurity" defaultMessage="app.settings.isolationSecurity" />
       ),
       preCondition: (
-        <FormattedMessage id="先决条件" defaultMessage="先决条件"/>
+        <FormattedMessage id="app.settings.preCondition" defaultMessage="app.settings.preCondition"/>
       ),
       workApplication: (
-        <FormattedMessage id="工作申请" defaultMessage="工作申请"/>
+        <FormattedMessage id="app.settings.workApplication" defaultMessage="app.settings.workApplication"/>
       ),
       workPreMeeting: (
-        <FormattedMessage id="工前会" defaultMessage="工前会"/>
+        <FormattedMessage id="app.settings.workPreMeeting" defaultMessage="app.settings.workPreMeeting"/>
       ),
       agendum: (
-        <FormattedMessage id="执行规程" defaultMessage="执行规程"/>
+        <FormattedMessage id="app.settings.agendum" defaultMessage="app.settings.agendum"/>
       ),
       relateDoc: (
-        <FormattedMessage id="关联文档" defaultMessage="关联文档"/>
+        <FormattedMessage id="app.settings.relateDoc" defaultMessage="app.settings.relateDoc"/>
       ),
       qualityPlan: (
-        <FormattedMessage id="质量计划" defaultMessage="质量计划"/>
+        <FormattedMessage id="app.settings.qualityPlan" defaultMessage="app.settings.qualityPlan"/>
       ),
     };
     this.state = {

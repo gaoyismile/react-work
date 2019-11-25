@@ -52,4 +52,13 @@ export default {
   'app.settings.notification.todo-description': '待办任务将以站内信的形式通知',
   'app.settings.open': '开',
   'app.settings.close': '关',
+  "app.settings.workDesc":'工作概述',
+  "app.settings.workOrder":'工作指令',
+  "app.settings.isolationSecurity":'隔离安措要求',
+  "app.settings.preCondition":'先决条件',
+  "app.settings.workApplication":'工作申请',
+  "app.settings.workPreMeeting":'工前会',
+  "app.settings.agendum":'执行规程',
+  "app.settings.relateDoc":'关联文档',
+  "app.settings.qualityPlan":'质量计划', 
 };
