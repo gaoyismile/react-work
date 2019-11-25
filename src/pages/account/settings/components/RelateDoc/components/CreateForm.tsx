@@ -1,6 +1,6 @@
 import { FormComponentProps } from 'antd/es/form';
 import React from 'react';
-import { Upload, Button, Icon,Form, Modal } from 'antd';
+import { Upload, Button, Icon,Form, Modal,message } from 'antd';
 import '../style.less'
 
 interface CreateFormProps extends FormComponentProps {
@@ -37,11 +37,21 @@ const CreateForm: React.FC<CreateFormProps> = props => {
     listType: 'picture',
     defaultFileList: [...fileList],
     className: 'upload-list-inline',
+    onChange(info: { file: { status: string; name: any; }; fileList: any; }) {
+      if (info.file.status !== 'uploading') {
+        console.log(info.file, info.fileList);
+      }
+      if (info.file.status === 'done') {
+        message.success(`${info.file.name} file uploaded successfully`);
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
   };
   return (
     <Modal
       destroyOnClose
-      title="新建用户"
+      title="新建"
       visible={modalVisible}
       onOk={okHandle}
       onCancel={() => handleModalVisible()}
