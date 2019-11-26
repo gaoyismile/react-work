@@ -14,6 +14,8 @@ import WorkPreMeeting from './components/WorkPreMeeting';
 import RelateDoc from './components/RelateDoc';
 import Agendum  from './components/Agendum';
 import QualityPlan  from './components/QualityPlan';
+import RelateMan  from './components/RalateMan';
+
 import { CurrentUser } from './data.d';
 import styles from './style.less';
  
@@ -26,7 +28,7 @@ interface SettingsProps {
 
 type SettingsStateKeys = 'workDesc' | 'workOrder' | 'isolationSecurity' | 'preCondition'
                         | 'workApplication' | 'workPreMeeting' | 'agendum' | 'relateDoc'
-                        | 'qualityPlan';
+                        | 'qualityPlan' | 'relateMan';
 interface SettingsState {
   mode: 'inline' | 'horizontal';
   menuMap: {
@@ -70,6 +72,9 @@ class Settings extends Component<
       ),
       qualityPlan: (
         <FormattedMessage id="app.settings.qualityPlan" defaultMessage="app.settings.qualityPlan"/>
+      ),
+      relateMan: (
+        <FormattedMessage id="app.settings.relateMan" defaultMessage="app.settings.relateMan"/>
       ),
     };
     this.state = {
@@ -151,6 +156,8 @@ class Settings extends Component<
         return <RelateDoc />;
       case 'qualityPlan':
         return <QualityPlan />;
+      case 'relateMan':
+        return <RelateMan />;
       default:
         break;
     }

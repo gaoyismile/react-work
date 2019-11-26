@@ -61,4 +61,5 @@ export default {
   "app.settings.agendum":'执行规程',
   "app.settings.relateDoc":'关联文档',
   "app.settings.qualityPlan":'质量计划', 
+  "app.settings.relateMan":'相关人员',
 };
