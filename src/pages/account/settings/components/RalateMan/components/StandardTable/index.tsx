@@ -1,6 +1,6 @@
-import { Alert, Table } from 'antd';
+import { Table } from 'antd';
 import { ColumnProps, TableRowSelection, TableProps } from 'antd/es/table';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import { TableListItem } from '../../data';
 import styles from './index.less';
@@ -100,7 +100,7 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
   };
 
   render() {
-    const { selectedRowKeys, needTotalList } = this.state;
+    const { selectedRowKeys } = this.state;
     const { data, rowKey, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination

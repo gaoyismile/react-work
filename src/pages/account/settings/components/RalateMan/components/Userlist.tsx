@@ -1,11 +1,4 @@
-import {
-  Button,
-  Col,
-  Form,
-  Input,
-  Row,
-  message,
-} from 'antd';
+import { Button, Col, Form, Input, Row, message } from 'antd';
 import React, { Component } from 'react';
 
 import { Dispatch, Action } from 'redux';
@@ -16,7 +9,7 @@ import moment from 'moment';
 import { StateType } from '../model';
 import StandardTable, { StandardTableColumnProps } from '../components/StandardTable';
 import { FormValueType } from '../components/UpdateForm';
-import { TableListItem, TableListPagination, TableListParams } from '../data';
+import { TableListItem, TableListPagination, TableListParams } from './userlistData';
 import { RouteContext } from '@ant-design/pro-layout';
 import FooterToolbar from '../../FooterToolbar';
 import creatHistory from 'history/createHashHistory';
@@ -41,6 +34,8 @@ interface TableListProps extends FormComponentProps {
   >;
   loading: boolean;
   listAndWorkApplicationList: StateType;
+  deptId: string;
+  setValue: string;
 }
 
 interface TableListState {
@@ -100,13 +95,14 @@ class TableList extends Component<TableListProps, TableListState> {
       sorter: true,
       render: (val: string) => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
     },
-    
   ];
 
   componentDidMount() {
     const { dispatch } = this.props;
+    const values = { deptId: this.props.deptId };
     dispatch({
       type: 'listAndWorkApplicationList/fetch',
+      payload: values,
     });
   }
 
@@ -133,7 +129,6 @@ class TableList extends Component<TableListProps, TableListState> {
     if (sorter.field) {
       params.sorter = `${sorter.field}_${sorter.order}`;
     }
-
     dispatch({
       type: 'listAndWorkApplicationList/fetch',
       payload: params,
@@ -162,11 +157,11 @@ class TableList extends Component<TableListProps, TableListState> {
   handleMenuClick = () => {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
-    if (!selectedRows){
+    if (!selectedRows) {
       return;
     }
-    if (selectedRows==null || selectedRows.length<1){
-      alert("请至少选择一项");
+    if (selectedRows == null || selectedRows.length < 1) {
+      alert('请至少选择一项');
       return;
     }
     dispatch({
@@ -179,7 +174,7 @@ class TableList extends Component<TableListProps, TableListState> {
           selectedRows: [],
         });
       },
-    });   
+    });
   };
 
   handleSelectRows = (rows: TableListItem[]) => {
@@ -229,7 +224,7 @@ class TableList extends Component<TableListProps, TableListState> {
     this.setState({
       visible: true,
     });
-  }
+  };
   handleCancel = () => {
     this.setState({ visible: false });
   };
@@ -259,8 +254,8 @@ class TableList extends Component<TableListProps, TableListState> {
       updateModalVisible: !!flag,
       stepFormValues: record || {},
     });
-  }
-  handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
+  };
+  handleAdd = (fields: { userName: any; password: any; nickName: any; sex: any; age: any }) => {
     const { dispatch } = this.props;
     dispatch({
       type: 'listAndWorkApplicationList/add',
@@ -275,7 +270,15 @@ class TableList extends Component<TableListProps, TableListState> {
     message.success('添加成功');
     this.handleModalVisible();
   };
-
+  // 选中行
+  onClickRow = (record: { userName: any }) => {
+    return {
+      onClick: () => {
+        this.props.setValue(record.userName);
+        console.log('行内的userName:', record.userName);
+      },
+    };
+  };
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -284,13 +287,12 @@ class TableList extends Component<TableListProps, TableListState> {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="快速查询">
-              {getFieldDecorator('workApplicationTitle')(<Input placeholder="姓名/工号" />)}
+              {getFieldDecorator('userName')(<Input placeholder="姓名/工号" />)}
             </FormItem>
           </Col>
           <Col md={16} sm={24}>
             <span className={styles.submitButtons}>
-              <Button icon="search"  type="primary" htmlType="submit">
-              </Button> 
+              <Button icon="search" type="primary" htmlType="submit"></Button>
             </span>
           </Col>
         </Row>
@@ -302,11 +304,10 @@ class TableList extends Component<TableListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  backClick(){
+  backClick() {
     history.goBack();
   }
 
-  
   render() {
     const {
       listAndWorkApplicationList: { data },
@@ -315,27 +316,28 @@ class TableList extends Component<TableListProps, TableListState> {
     const { selectedRows } = this.state;
     return (
       <>
-              <div className={styles.tableList}>
-                <div className={styles.tableListForm}>{this.renderForm()}</div>
-                <StandardTable
-                  selectedRows={selectedRows}
-                  loading={loading}
-                  data={data}
-                  columns={this.columns}
-                  onSelectRow={this.handleSelectRows}
-                  onChange={this.handleStandardTableChange}
-                  scroll={{ y: 220 }}
-                />
-              </div>
+        <div className={styles.tableList}>
+          <div className={styles.tableListForm}>{this.renderForm()}</div>
+          <StandardTable
+            selectedRows={selectedRows}
+            loading={loading}
+            data={data}
+            columns={this.columns}
+            onSelectRow={this.handleSelectRows}
+            onChange={this.handleStandardTableChange}
+            onRow={this.onClickRow}
+            scroll={{ y: 180 }}
+          />
+        </div>
         <RouteContext.Consumer>
-          { ()=> (
+          {() => (
             <FooterToolbar>
               <Button type="primary" onClick={this.backClick}>
                 返回
               </Button>
             </FooterToolbar>
           )}
-        </RouteContext.Consumer> 
+        </RouteContext.Consumer>
       </>
     );
   }
