@@ -18,8 +18,7 @@ import { connect } from 'dva';
 import moment from 'moment';
 import { StateType } from './model';
 import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
-import { FormValueType } from './components/UpdateForm';
-import { TableListItem, TableListPagination, TableListParams } from './data';
+import { TableListItem, TableListPagination, TableListParams } from './data.d';
 import { RouteContext } from '@ant-design/pro-layout';
 import FooterToolbar from '../FooterToolbar';
 import creatHistory from 'history/createHashHistory';
@@ -35,17 +34,17 @@ const getValue = (obj: { [x: string]: string[] }) =>
 const { Panel } = Collapse;
 const history = creatHistory();
 
-interface TableListProps extends FormComponentProps {
+interface RelateManListProps extends FormComponentProps {
   dispatch: Dispatch<
     Action<
-      | 'listAndWorkApplicationList/add'
-      | 'listAndWorkApplicationList/fetch'
-      | 'listAndWorkApplicationList/remove'
-      | 'listAndWorkApplicationList/update'
+      | 'listAndRelateManList/add'
+      | 'listAndRelateManList/fetch'
+      | 'listAndRelateManList/remove'
+      | 'listAndRelateManList/update'
     >
   >;
   loading: boolean;
-  listAndWorkApplicationList: StateType;
+  listAndRelateManList: StateType;
 }
 
 interface TableListState {
@@ -61,21 +60,21 @@ interface TableListState {
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    listAndWorkApplicationList,
+    listAndRelateManList,
     loading,
   }: {
-    listAndWorkApplicationList: StateType;
+    listAndRelateManList: StateType;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    listAndWorkApplicationList,
-    loading: loading.models.listAndWorkApplicationList,
+    listAndRelateManList,
+    loading: loading.models.listAndRelateManList,
   }),
 )
-class TableList extends Component<TableListProps, TableListState> {
+class TableList extends Component<RelateManListProps, TableListState> {
   state: TableListState = {
     modalVisible: false,
     updateModalVisible: false,
@@ -104,8 +103,12 @@ class TableList extends Component<TableListProps, TableListState> {
       dataIndex: 'nickName',
     },
     {
+      title: '部门id',
+      dataIndex: 'deptId',
+    },
+    {
       title: '部门',
-      dataIndex: 'sex',
+      dataIndex: 'deptName',
     },
     {
       title: '创建时间',
@@ -119,7 +122,7 @@ class TableList extends Component<TableListProps, TableListState> {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndWorkApplicationList/fetch',
+      type: 'listAndRelateManList/fetch',
     });
   }
 
@@ -148,7 +151,7 @@ class TableList extends Component<TableListProps, TableListState> {
     }
 
     dispatch({
-      type: 'listAndWorkApplicationList/fetch',
+      type: 'listAndRelateManList/fetch',
       payload: params,
     });
   };
@@ -160,7 +163,7 @@ class TableList extends Component<TableListProps, TableListState> {
       formValues: {},
     });
     dispatch({
-      type: 'listAndWorkApplicationList/fetch',
+      type: 'listAndRelateManList/fetch',
       payload: {},
     });
   };
@@ -183,10 +186,13 @@ class TableList extends Component<TableListProps, TableListState> {
       return;
     }
     dispatch({
-      type: 'listAndWorkApplicationList/remove',
+      type: 'listAndRelateManList/remove',
       payload: {
         key: selectedRows.map(row => row.key),
       },
+      this:this.setState({
+        visible:true
+      }),
       callback: () => {
         this.setState({
           selectedRows: [],
@@ -219,7 +225,7 @@ class TableList extends Component<TableListProps, TableListState> {
       });
 
       dispatch({
-        type: 'listAndWorkApplicationList/fetch',
+        type: 'listAndRelateManList/fetch',
         payload: values,
       });
     });
@@ -228,13 +234,6 @@ class TableList extends Component<TableListProps, TableListState> {
   handleModalVisible = (flag?: boolean) => {
     this.setState({
       modalVisible: !!flag,
-    });
-  };
-
-  handleUpdateModalVisible = (flag?: boolean, record?: FormValueType) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      stepFormValues: record || {},
     });
   };
 
@@ -247,36 +246,10 @@ class TableList extends Component<TableListProps, TableListState> {
     this.setState({ visible: false });
   };
 
-  handleUpdate = (fields: FormValueType) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'listAndWorkApplicationList/update',
-      payload: {
-        userid: fields.userid,
-        userName: fields.userName,
-        nickName: fields.nickName,
-        key: fields.key,
-        password: fields.password,
-        sex: fields.sex,
-        age: fields.age,
-        userStatus: fields.userStatus,
-      },
-    });
-
-    message.success('修改成功');
-    this.handleUpdateModalVisible();
-  };
-
-  viewItem = (flag?: boolean, record?: FormValueType) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      stepFormValues: record || {},
-    });
-  }
   handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndWorkApplicationList/add',
+      type: 'listAndRelateManList/add',
       payload: {
         userName: fields.userName,
         password: fields.password,
@@ -297,7 +270,7 @@ class TableList extends Component<TableListProps, TableListState> {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="快速查询">
-              {getFieldDecorator('workApplicationTitle')(<Input placeholder="姓名/工号" />)}
+              {getFieldDecorator('userName')(<Input placeholder="姓名/工号" />)}
             </FormItem>
           </Col>
           <Col md={16} sm={24}>
@@ -327,7 +300,7 @@ class TableList extends Component<TableListProps, TableListState> {
   
   render() {
     const {
-      listAndWorkApplicationList: { data },
+      listAndRelateManList: { data },
       loading,
     } = this.props;
     const { selectedRows } = this.state;
@@ -358,15 +331,7 @@ class TableList extends Component<TableListProps, TableListState> {
                 onCancel={this.handleCancel}
                 style={{ top:0 }}
                 footer={
-                  [] // 设置footer为空，去掉 取消 确定默认按钮
-                  // <Button key="back" onClick={this.handleCancel}>
-                  //   返回
-                  // </Button>
-                // <FooterToolbar>                  
-                //   <Button type="primary" onClick={this.handleCancel}>
-                //       返回
-                //   </Button>
-                // </FooterToolbar>
+                  [] 
                 }
               >
                   <Add/>
@@ -385,4 +350,4 @@ class TableList extends Component<TableListProps, TableListState> {
   }
 }
 
-export default Form.create<TableListProps>()(TableList);
+export default Form.create<RelateManListProps>()(TableList);

@@ -1,14 +1,21 @@
 import request from '@/utils/request';
-import { TableListParams } from './data.d';
+import { TableListParams } from './userlistData';
 
 export async function queryRule(params: TableListParams) {
-  return request('/api/relateManList', {
+  return request('/api/userDeptTreeList', {
     params,
   });
 }
 
+export async function submitUserArray(params: any) {
+  return request('/api/submitUserDeptTree', {
+    method: 'POST',
+    data: params,
+  });
+}
+
 export async function removeRule(params: TableListParams) {
-  return request('/api/relateManList/delete', {
+  return request('/api/rule/delete', {
     method: 'POST',
     data: {
       ...params,

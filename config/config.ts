@@ -176,6 +176,20 @@ export default {
               hideInMenu: true,
             },
             {
+              name: 'relateman-list',
+              icon: 'smile',
+              path: '/account/settings/components/RalateMan',
+              component: './account/settings/components/RalateMan',
+              hideInMenu: true,
+            },
+            {
+              name: 'deptTree-list',
+              icon: 'smile',
+              path: '/account/settings/components/RalateMan/components/userlist/Userlist',
+              component: './account/settings/components/RalateMan/components/userlist/Userlist',
+              hideInMenu: true,
+            },
+            {
               component: './404',
             },
           ],

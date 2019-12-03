@@ -1,8 +1,9 @@
 import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
-import { addRule, queryRule, removeRule, updateRule } from './service';
+import { message } from 'antd';
+import { addRule, queryRule, removeRule, updateRule, submitUserArray } from './service';
 
-import { TableListData } from './data.d';
+import { TableListData } from './userlistData';
 
 export interface StateType {
   data: TableListData;
@@ -18,9 +19,10 @@ export interface ModelType {
   state: StateType;
   effects: {
     fetch: Effect;
+    submitArray: Effect;
     add: Effect;
     remove: Effect;
-    update: Effect;
+    update: Effect; 
   };
   reducers: {
     save: Reducer<StateType>;
@@ -28,7 +30,7 @@ export interface ModelType {
 }
 
 const Model: ModelType = {
-  namespace: 'listAndWorkPreMeetingList',
+  namespace: 'listAndDeptTreeList',
 
   state: {
     data: {
@@ -44,6 +46,10 @@ const Model: ModelType = {
         type: 'save',
         payload: response,
       });
+    },
+    *submitArray({ payload }, { call }) {
+      yield call(submitUserArray, payload);
+      message.success('提交成功');
     },
     *add({ payload, callback }, { call, put }) {
       const response = yield call(addRule, payload);

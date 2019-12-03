@@ -2,7 +2,7 @@ import { AnyAction, Reducer } from 'redux';
 import { EffectsCommandMap } from 'dva';
 import { addRule, queryRule, removeRule, updateRule } from './service';
 
-import { TableListData } from './data';
+import { TableListData } from './data.d';
 
 export interface StateType {
   data: TableListData;
@@ -28,7 +28,7 @@ export interface ModelType {
 }
 
 const Model: ModelType = {
-  namespace: 'listAndWorkApplicationList',
+  namespace: 'listAndRelateManList',
 
   state: {
     data: {

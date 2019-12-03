@@ -1,13 +1,10 @@
 export interface TableListItem {
   key: number,
   userid: number;
-  userStatus: string;
   userName: string;
   nickName: string;
-  password: string;
-  sex: number;
-  age: number;
-  updatedAt: Date;
+  deptId: number;
+  deptName: string;
   createdAt: Date;
 }
 
@@ -25,7 +22,7 @@ export interface TableListData {
 export interface TableListParams {
   sorter: string;
   status: string;
-  name: string;
+  userName: string;
   pageSize: number;
   currentPage: number;
 }

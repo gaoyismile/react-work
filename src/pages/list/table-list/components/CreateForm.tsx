@@ -44,7 +44,7 @@ const CreateForm: React.FC<CreateFormProps> = props => {
       </FormItem>
       <FormItem labelCol={{ span: 5 }} wrapperCol={{ span: 15 }} label="性别">
         {form.getFieldDecorator('sex', {
-              initialValue: '男',
+              initialValue: '1',
             })(
               <Select style={{ width: '100%' }}>
                 <Option value="1">男</Option>

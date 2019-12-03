@@ -6,12 +6,11 @@ import { FormComponentProps } from 'antd/es/form';
 import { SorterResult } from 'antd/es/table';
 import { connect } from 'dva';
 import moment from 'moment';
-import { StateType } from '../model';
-import StandardTable, { StandardTableColumnProps } from '../components/StandardTable';
-import { FormValueType } from '../components/UpdateForm';
+import { StateType } from './model';
+import StandardTable, { StandardTableColumnProps } from '../StandardTable';
 import { TableListItem, TableListPagination, TableListParams } from './userlistData';
 import { RouteContext } from '@ant-design/pro-layout';
-import FooterToolbar from '../../FooterToolbar';
+import FooterToolbar from '../../../FooterToolbar';
 import creatHistory from 'history/createHashHistory';
 import styles from '../style.less';
 
@@ -26,16 +25,19 @@ const history = creatHistory();
 interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<
     Action<
-      | 'listAndWorkApplicationList/add'
-      | 'listAndWorkApplicationList/fetch'
-      | 'listAndWorkApplicationList/remove'
-      | 'listAndWorkApplicationList/update'
+      | 'listAndDeptTreeList/add'
+      | 'listAndDeptTreeList/fetch'
+      | 'listAndDeptTreeList/remove'
+      | 'listAndDeptTreeList/update'
+      | 'listAndDeptTreeList/submitArray'
     >
   >;
   loading: boolean;
-  listAndWorkApplicationList: StateType;
+  listAndDeptTreeList: StateType;
   deptId: string;
-  setValue: string;
+  setValue: [];
+  submitting: boolean;
+  resultArray:[];
 }
 
 interface TableListState {
@@ -51,18 +53,23 @@ interface TableListState {
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    listAndWorkApplicationList,
+    listAndDeptTreeList,
     loading,
   }: {
-    listAndWorkApplicationList: StateType;
+    listAndDeptTreeList: StateType;
     loading: {
       models: {
         [key: string]: boolean;
       };
+      effects: {
+        [key: string]: boolean;
+      };
     };
   }) => ({
-    listAndWorkApplicationList,
-    loading: loading.models.listAndWorkApplicationList,
+    listAndDeptTreeList,
+    loading: loading.models.listAndDeptTreeList,
+    submitting: loading.effects['listAndDeptTreeList/submitArray'],
+
   }),
 )
 class TableList extends Component<TableListProps, TableListState> {
@@ -86,8 +93,12 @@ class TableList extends Component<TableListProps, TableListState> {
       dataIndex: 'nickName',
     },
     {
-      title: '部门',
-      dataIndex: 'sex',
+      title: '部门名称',
+      dataIndex: 'deptName',
+    },
+    {
+      title: '部门层级',
+      dataIndex: 'deptRank',
     },
     {
       title: '创建时间',
@@ -101,7 +112,7 @@ class TableList extends Component<TableListProps, TableListState> {
     const { dispatch } = this.props;
     const values = { deptId: this.props.deptId };
     dispatch({
-      type: 'listAndWorkApplicationList/fetch',
+      type: 'listAndDeptTreeList/fetch',
       payload: values,
     });
   }
@@ -130,7 +141,7 @@ class TableList extends Component<TableListProps, TableListState> {
       params.sorter = `${sorter.field}_${sorter.order}`;
     }
     dispatch({
-      type: 'listAndWorkApplicationList/fetch',
+      type: 'listAndDeptTreeList/fetch',
       payload: params,
     });
   };
@@ -142,7 +153,7 @@ class TableList extends Component<TableListProps, TableListState> {
       formValues: {},
     });
     dispatch({
-      type: 'listAndWorkApplicationList/fetch',
+      type: 'listAndDeptTreeList/fetch',
       payload: {},
     });
   };
@@ -165,7 +176,7 @@ class TableList extends Component<TableListProps, TableListState> {
       return;
     }
     dispatch({
-      type: 'listAndWorkApplicationList/remove',
+      type: 'listAndDeptTreeList/remove',
       payload: {
         key: selectedRows.map(row => row.key),
       },
@@ -194,6 +205,7 @@ class TableList extends Component<TableListProps, TableListState> {
       const values = {
         ...fieldsValue,
         updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+        deptId: this.props.deptId
       };
 
       this.setState({
@@ -201,7 +213,7 @@ class TableList extends Component<TableListProps, TableListState> {
       });
 
       dispatch({
-        type: 'listAndWorkApplicationList/fetch',
+        type: 'listAndDeptTreeList/fetch',
         payload: values,
       });
     });
@@ -210,13 +222,6 @@ class TableList extends Component<TableListProps, TableListState> {
   handleModalVisible = (flag?: boolean) => {
     this.setState({
       modalVisible: !!flag,
-    });
-  };
-
-  handleUpdateModalVisible = (flag?: boolean, record?: FormValueType) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      stepFormValues: record || {},
     });
   };
 
@@ -229,53 +234,13 @@ class TableList extends Component<TableListProps, TableListState> {
     this.setState({ visible: false });
   };
 
-  handleUpdate = (fields: FormValueType) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'listAndWorkApplicationList/update',
-      payload: {
-        userid: fields.userid,
-        userName: fields.userName,
-        nickName: fields.nickName,
-        key: fields.key,
-        password: fields.password,
-        sex: fields.sex,
-        age: fields.age,
-        userStatus: fields.userStatus,
-      },
-    });
-
-    message.success('修改成功');
-    this.handleUpdateModalVisible();
-  };
-
-  viewItem = (flag?: boolean, record?: FormValueType) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      stepFormValues: record || {},
-    });
-  };
-  handleAdd = (fields: { userName: any; password: any; nickName: any; sex: any; age: any }) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'listAndWorkApplicationList/add',
-      payload: {
-        userName: fields.userName,
-        password: fields.password,
-        nickName: fields.nickName,
-        sex: fields.sex,
-        age: fields.age,
-      },
-    });
-    message.success('添加成功');
-    this.handleModalVisible();
-  };
   // 选中行
-  onClickRow = (record: { userName: any }) => {
+  onClickRow = (record: { userName: any,userid: any,nickName:any,deptId:any,deptName:any }) => {
+    var recordArray: any[] | never[]=[];
+    recordArray.push(record.userName,record.userid,record.nickName,record.deptId,record.deptName);
     return {
       onClick: () => {
-        this.props.setValue(record.userName);
-        console.log('行内的userName:', record.userName);
+        this.props.setValue(recordArray);
       },
     };
   };
@@ -287,7 +252,7 @@ class TableList extends Component<TableListProps, TableListState> {
         <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
           <Col md={8} sm={24}>
             <FormItem label="快速查询">
-              {getFieldDecorator('userName')(<Input placeholder="姓名/工号" />)}
+              {getFieldDecorator('userName')(<Input placeholder="工号/用户姓名" />)}
             </FormItem>
           </Col>
           <Col md={16} sm={24}>
@@ -308,10 +273,26 @@ class TableList extends Component<TableListProps, TableListState> {
     history.goBack();
   }
 
+  validate = () => {
+    const {
+      dispatch,
+    } = this.props;
+    const values = this.props.resultArray;
+    // const values =["1","2"];
+    console.log("提交的value:",values);
+    // submit the values
+    dispatch({
+      type: 'listAndDeptTreeList/submitArray',
+      payload: values,
+    });
+     
+  };
+
   render() {
     const {
-      listAndWorkApplicationList: { data },
+      listAndDeptTreeList: { data },
       loading,
+      submitting,
     } = this.props;
     const { selectedRows } = this.state;
     return (
@@ -332,6 +313,9 @@ class TableList extends Component<TableListProps, TableListState> {
         <RouteContext.Consumer>
           {() => (
             <FooterToolbar>
+              <Button type="primary" onClick={this.validate} loading={submitting}>
+                提交
+              </Button>
               <Button type="primary" onClick={this.backClick}>
                 返回
               </Button>
