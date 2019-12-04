@@ -81,6 +81,7 @@ class TableList extends Component<TableListProps, TableListState> {
     selectedRows: [],
     formValues: {},
     stepFormValues: {},
+    
   };
 
   columns: StandardTableColumnProps[] = [
@@ -285,7 +286,7 @@ class TableList extends Component<TableListProps, TableListState> {
       type: 'listAndDeptTreeList/submitArray',
       payload: values,
     });
-     
+      //this.props
   };
 
   render() {

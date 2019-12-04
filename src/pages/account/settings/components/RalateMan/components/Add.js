@@ -85,6 +85,7 @@ class TreeComponent extends React.Component {
               deptId={this.state.deptId}
               setValue={this.setValue.bind(this)}
               resultArray={this.state.resultArray}
+              visible={this.props.visible}
             />
           </Col>
         </Row>

@@ -54,7 +54,6 @@ interface TableListState {
   expandForm: boolean;
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
-  stepFormValues: Partial<TableListItem>;
 }
 
 /* eslint react/no-multi-comp:0 */
@@ -82,7 +81,6 @@ class TableList extends Component<RelateManListProps, TableListState> {
     visible: false,
     selectedRows: [],
     formValues: {},
-    stepFormValues: {},
   };
 
   columns: StandardTableColumnProps[] = [
@@ -185,20 +183,20 @@ class TableList extends Component<RelateManListProps, TableListState> {
       alert("请至少选择一项");
       return;
     }
-    dispatch({
+    const later =dispatch({
       type: 'listAndRelateManList/remove',
       payload: {
         key: selectedRows.map(row => row.key),
       },
-      this:this.setState({
-        visible:true
-      }),
       callback: () => {
         this.setState({
           selectedRows: [],
         });
       },
-    });   
+    });
+    later.then(()=>{// 删除之后页面要刷新，还得重新获取数据
+      this.componentDidMount()
+    })
   };
 
   handleSelectRows = (rows: TableListItem[]) => {
@@ -244,22 +242,6 @@ class TableList extends Component<RelateManListProps, TableListState> {
   }
   handleCancel = () => {
     this.setState({ visible: false });
-  };
-
-  handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'listAndRelateManList/add',
-      payload: {
-        userName: fields.userName,
-        password: fields.password,
-        nickName: fields.nickName,
-        sex: fields.sex,
-        age: fields.age,
-      },
-    });
-    message.success('添加成功');
-    this.handleModalVisible();
   };
 
   renderSimpleForm() {
