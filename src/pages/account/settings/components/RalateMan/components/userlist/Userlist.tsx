@@ -279,14 +279,14 @@ class TableList extends Component<TableListProps, TableListState> {
       dispatch,
     } = this.props;
     const values = this.props.resultArray;
-    // const values =["1","2"];
     console.log("提交的value:",values);
     // submit the values
     dispatch({
       type: 'listAndDeptTreeList/submitArray',
       payload: values,
     });
-      //this.props
+    this.props.handleCancel();//关闭当前弹窗
+    this.props.refreshNode();//局部刷新页面
   };
 
   render() {

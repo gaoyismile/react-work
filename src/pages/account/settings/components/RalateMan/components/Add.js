@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Row } from 'antd';
+import { Col, Row,Modal } from 'antd';
 import Tree from './tree/Tree';
 import treeData from './tree.json';
 import styles from './style.less';
@@ -18,6 +18,7 @@ class TreeComponent extends React.Component {
       loading: false,
       userName: '',
       resultArray: [],
+      visible: false,
     };
   }
 
@@ -69,9 +70,24 @@ class TreeComponent extends React.Component {
       resultArray: newArray,
     });
   }
+  handleCancel = () => {
+    let status = false;
+    this.props.status(status);
+  };
 
   render() {
+    const { visible} = this.props;
     return (
+       <Modal 
+                width="100%"
+                visible={visible}
+                title="选择用户"
+                onCancel={this.handleCancel}
+                style={{ top:0 }}
+                footer={
+                  [] 
+                }
+              >
       <GridContent>
         <Row gutter={24}>
           <Col lg={5} md={24}>
@@ -85,7 +101,8 @@ class TreeComponent extends React.Component {
               deptId={this.state.deptId}
               setValue={this.setValue.bind(this)}
               resultArray={this.state.resultArray}
-              visible={this.props.visible}
+              handleCancel={this.handleCancel}
+              refreshNode={this.props.refreshNode}
             />
           </Col>
         </Row>
@@ -102,6 +119,7 @@ class TreeComponent extends React.Component {
           )}
         </Row>
       </GridContent>
+      </Modal> 
     );
   }
 }

@@ -195,7 +195,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
       },
     });
     later.then(()=>{// 删除之后页面要刷新，还得重新获取数据
-      this.componentDidMount()
+      this.componentDidMount();
     })
   };
 
@@ -231,15 +231,20 @@ class TableList extends Component<RelateManListProps, TableListState> {
 
   handleModalVisible = (flag?: boolean) => {
     this.setState({
-      modalVisible: !!flag,
+      visible: !!flag,
     });
   };
 
-  addItem = () => {
+  changeStatus = (status: any) =>{
     this.setState({
-      visible: true,
-    });
+      visible:status
+    })
   }
+  
+  refreshNode = () =>{
+    this.componentDidMount();
+  }
+
   handleCancel = () => {
     this.setState({ visible: false });
   };
@@ -260,7 +265,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
               <Button icon="search"  type="primary" htmlType="submit">
               </Button>
               &nbsp;&nbsp;&nbsp;
-              <Button icon="plus" type="primary" onClick={() => this.addItem ()}>
+              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               </Button>
               &nbsp;&nbsp;&nbsp;
               <Button icon="delete" type="primary" onClick={this.handleMenuClick} />  
@@ -306,7 +311,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
             </Card>
           </Panel>
         </Collapse>
-        <Modal 
+        {/* <Modal 
                 width="100%"
                 visible={visible}
                 title="选择用户"
@@ -317,7 +322,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
                 }
               >
                   <Add/>
-          </Modal>
+          </Modal> */}
         <RouteContext.Consumer>
           { ()=> (
             <FooterToolbar>
@@ -327,6 +332,11 @@ class TableList extends Component<RelateManListProps, TableListState> {
             </FooterToolbar>
           )}
         </RouteContext.Consumer> 
+        <Add 
+          visible={visible} 
+          status={this.changeStatus}
+          refreshNode={this.refreshNode}
+        />
       </>
     );
   }

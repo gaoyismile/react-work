@@ -273,7 +273,7 @@ class TableList extends Component<TableListProps, TableListState> {
 
   handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
     const { dispatch } = this.props;
-    dispatch({
+    const later = dispatch({
       type: 'listAndtableList/add',
       payload: {
         userName: fields.userName,
@@ -284,12 +284,15 @@ class TableList extends Component<TableListProps, TableListState> {
       },
     });
     message.success('添加成功');
-    this.handleModalVisible();
+    this.handleModalVisible();//关闭弹窗
+    later.then(()=>{//刷新列表
+      this.componentDidMount();
+    })
   };
 
   handleUpdate = (fields: FormValueType) => {
     const { dispatch } = this.props;
-    dispatch({
+    const later = dispatch({
       type: 'listAndtableList/update',
       payload: {
         userid: fields.userid,
@@ -305,6 +308,9 @@ class TableList extends Component<TableListProps, TableListState> {
 
     message.success('修改成功');
     this.handleUpdateModalVisible();
+    later.then(()=>{//刷新列表
+      this.componentDidMount();
+    })
   };
 
   renderSimpleForm() {
