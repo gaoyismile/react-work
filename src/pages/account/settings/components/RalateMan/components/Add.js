@@ -103,7 +103,7 @@ class TreeComponent extends React.Component {
               resultArray={this.state.resultArray}
               handleCancel={this.handleCancel}
               refreshNode={this.props.refreshNode}
-            />
+            /> 
           </Col>
         </Row>
         <Row gutter={24}>已选择[双击移除]</Row>

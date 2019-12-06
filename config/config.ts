@@ -122,10 +122,29 @@ export default {
               component: './account/center',
             },
             {
-              name: '用户管理',
+              name: '用户管理附件',
               icon: 'smile',
               path: '/list/table-list',
               component: './list/table-list',
+            },
+            {
+              name: '用户管理',
+              icon: 'smile',
+              path: '/list/user-list',
+              component: './list/user-list',
+            },
+            {
+              name: '用户-角色',
+              icon: 'smile',
+              path: '/list/user-list/components/roleList',
+              component: './list/user-list/components/roleList',
+              hideInMenu: true,
+            },
+            {
+              name: '角色管理',
+              icon: 'smile',
+              path: '/list/role-list',
+              component: './list/role-list',
             },
             {
               name: '工作包管理',

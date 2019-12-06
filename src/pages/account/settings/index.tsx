@@ -35,6 +35,7 @@ interface SettingsState {
     [key: string]: React.ReactNode;
   };
   selectKey: SettingsStateKeys;
+  visible: boolean;
 }
 @connect(({ accountAndsettings }: { accountAndsettings: { currentUser: CurrentUser } }) => ({
   currentUser: accountAndsettings.currentUser,
@@ -81,6 +82,7 @@ class Settings extends Component<
       mode: 'inline',
       menuMap,
       selectKey: 'workDesc',
+      visible: false,
     };
   }
 
@@ -136,7 +138,7 @@ class Settings extends Component<
   };
 
   renderChildren = () => {
-    const { selectKey } = this.state;
+    const { selectKey,visible } = this.state;
     switch (selectKey) {
       case 'workDesc':
         return <AdvancedForm />;
@@ -157,7 +159,7 @@ class Settings extends Component<
       case 'qualityPlan':
         return <QualityPlan />;
       case 'relateMan':
-        return <RelateMan />;
+        return <RelateMan visible={visible}/>;
       default:
         break;
     }

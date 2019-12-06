@@ -15,6 +15,8 @@ export default {
   'menu.exception.500': '500',
   'menu.form': '表单页',
   'menu.用户管理': '用户管理',
+  'menu.用户管理附件': '用户管理附件',
+  'menu.角色管理': '角色管理',
   'menu.工作包管理': '工作包管理',
   'menu.advanced-form':'工作包表单',
   'menu.tabs':'工作包tabs',

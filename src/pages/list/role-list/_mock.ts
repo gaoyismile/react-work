@@ -1,22 +1,25 @@
 import { Request, Response } from 'express';
 import { parse } from 'url';
-import { TableListItem, TableListParams } from './data';
+import { TableListItem, TableListParams } from './data.d';
 
 // mock tableListDataSource
 let tableListDataSource: TableListItem[] = [];
 console.log("table数据:",tableListDataSource);
 for (let i = 0; i < 8; i += 1) {
   tableListDataSource.push({
-    userid: i,
-    userStatus: i % 6 === 0,
-    // href: 'https://ant.design',
-    // avatar: [
-    //   'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
-    //   'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
-    // ][i % 2],
+    key: i,
+    disabled: i % 6 === 0,
+    href: 'https://ant.design',
+    avatar: [
+      'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
+      'https://gw.alipayobjects.com/zos/rmsportal/udxAbMEhpwthVVcjLXik.png',
+    ][i % 2],
     userName: `TradeCode ${i}`,
+    title: `一个任务名称 ${i}`,
+    owner: '曲丽丽',
     nickName: '这是一段描述',
-    //status: Math.floor(Math.random() * 10) % 4,
+    callNo: Math.floor(Math.random() * 1000),
+    status: Math.floor(Math.random() * 10) % 4,
     updatedAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     createdAt: new Date(`2017-07-${Math.floor(i / 2) + 1}`),
     progress: Math.ceil(Math.random() * 100),
@@ -99,7 +102,7 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
     case 'post':
       const i = Math.ceil(Math.random() * 10000);
       tableListDataSource.unshift({
-        userid: i,
+        key: i,
         href: 'https://ant.design',
         avatar: [
           'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
@@ -108,7 +111,7 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
         userName: `TradeCode ${i}`,
         title: `一个任务名称 ${i}`,
         owner: '曲丽丽',
-        nickName: '11',
+        nickName: '',
         callNo: Math.floor(Math.random() * 1000),
         status: Math.floor(Math.random() * 10) % 2,
         updatedAt: new Date(),

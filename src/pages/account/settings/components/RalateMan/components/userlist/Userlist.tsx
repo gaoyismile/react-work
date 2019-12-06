@@ -202,7 +202,7 @@ class TableList extends Component<TableListProps, TableListState> {
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-
+ 
       const values = {
         ...fieldsValue,
         updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
@@ -270,8 +270,8 @@ class TableList extends Component<TableListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  backClick() {
-    history.goBack();
+  backClick= () => {
+    this.props.handleCancel();//关闭当前弹窗
   }
 
   validate = () => {

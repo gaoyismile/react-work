@@ -2,12 +2,10 @@ import {
   Button,
   Card,
   Col,
-  Modal,
   Form,
   Input,
   Row,
   message,
-  Collapse,
 } from 'antd';
 import React, { Component, Fragment } from 'react';
 
@@ -15,14 +13,12 @@ import { Dispatch, Action } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
 import { SorterResult } from 'antd/es/table';
 import { connect } from 'dva';
-import moment from 'moment';
 import { StateType } from './model';
+import CreateForm from './components/CreateForm';
 import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
+import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem, TableListPagination, TableListParams } from './data.d';
-import { RouteContext } from '@ant-design/pro-layout';
-import FooterToolbar from '../FooterToolbar';
-import creatHistory from 'history/createHashHistory';
-import Add from './components/Add';
+import RoleList from './components/roleList';
 import styles from './style.less';
 
 const FormItem = Form.Item;
@@ -31,96 +27,89 @@ const getValue = (obj: { [x: string]: string[] }) =>
     .map(key => obj[key])
     .join(',');
 
-const { Panel } = Collapse;
-const history = creatHistory();
-
-interface RelateManListProps extends FormComponentProps {
+interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<
     Action<
-      | 'listAndRelateManList/add'
-      | 'listAndRelateManList/fetch'
-      | 'listAndRelateManList/remove'
-      | 'listAndRelateManList/update'
+      | 'listAndUserList/add'
+      | 'listAndUserList/fetch'
+      | 'listAndUserList/remove'
+      | 'listAndUserList/update'
     >
   >;
   loading: boolean;
-  listAndRelateManList: StateType;
+  listAndUserList: StateType;
 }
 
 interface TableListState {
   modalVisible: boolean;
-  visible: boolean;
   updateModalVisible: boolean;
   expandForm: boolean;
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
+  stepFormValues: Partial<TableListItem>;
+  userid:'',
 }
 
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    listAndRelateManList,
+    listAndUserList,
     loading,
   }: {
-    listAndRelateManList: StateType;
+    listAndUserList: StateType;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    listAndRelateManList,
-    loading: loading.models.listAndRelateManList,
+    listAndUserList,
+    loading: loading.models.listAndUserList,
   }),
 )
-class TableList extends Component<RelateManListProps, TableListState> {
+class TableList extends Component<TableListProps, TableListState> {
   state: TableListState = {
     modalVisible: false,
     updateModalVisible: false,
     expandForm: false,
-    visible: false,
     selectedRows: [],
     formValues: {},
+    stepFormValues: {},
+    userid:null,
   };
 
   columns: StandardTableColumnProps[] = [
-    { 
+    {
       title: '操作',
-      render: (text, record) => (     
+      render: (text, record) => (
         <Fragment>
+          <Button icon="edit" onClick={() => this.handleUpdateModalVisible(true, record)} />
           <Button icon="delete" onClick={this.handleMenuClick} />
         </Fragment>
       ),
+      width:80,
     },
     {
-      title: '工号',
+      title: '账号',
       dataIndex: 'userName',
+      width:80,
     },
     {
-      title: '姓名',
+      title: '用户姓名',
       dataIndex: 'nickName',
+      width:200,
     },
     {
-      title: '部门id',
-      dataIndex: 'deptId',
-    },
-    {
-      title: '部门',
+      title: '部门名称',
       dataIndex: 'deptName',
+      width:200,
     },
-    {
-      title: '创建时间',
-      dataIndex: 'createdAt',
-      sorter: true,
-      render: (val: string) => <span>{moment(val).format('YYYY-MM-DD HH:mm:ss')}</span>,
-    },
-    
   ];
 
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndRelateManList/fetch',
+      type: 'listAndUserList/fetch',
     });
   }
 
@@ -149,7 +138,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
     }
 
     dispatch({
-      type: 'listAndRelateManList/fetch',
+      type: 'listAndUserList/fetch',
       payload: params,
     });
   };
@@ -161,7 +150,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
       formValues: {},
     });
     dispatch({
-      type: 'listAndRelateManList/fetch',
+      type: 'listAndUserList/fetch',
       payload: {},
     });
   };
@@ -184,7 +173,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
       return;
     }
     const later =dispatch({
-      type: 'listAndRelateManList/remove',
+      type: 'listAndUserList/remove',
       payload: {
         key: selectedRows.map(row => row.key),
       },
@@ -223,7 +212,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
       });
 
       dispatch({
-        type: 'listAndRelateManList/fetch',
+        type: 'listAndUserList/fetch',
         payload: values,
       });
     });
@@ -231,22 +220,57 @@ class TableList extends Component<RelateManListProps, TableListState> {
 
   handleModalVisible = (flag?: boolean) => {
     this.setState({
-      visible: !!flag,
+      modalVisible: !!flag,
     });
   };
 
-  changeStatus = (status: any) =>{
+  handleUpdateModalVisible = (flag?: boolean, record?: FormValueType) => {
     this.setState({
-      visible:status
-    })
-  }
-  
-  refreshNode = () =>{
-    this.componentDidMount();
-  }
+      updateModalVisible: !!flag,
+      stepFormValues: record || {},
+    });
+  };
 
-  handleCancel = () => {
-    this.setState({ visible: false });
+  handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
+    const { dispatch } = this.props;
+    const later = dispatch({
+      type: 'listAndUserList/add',
+      payload: {
+        userName: fields.userName,
+        password: fields.password,
+        nickName: fields.nickName,
+        sex: fields.sex,
+        age: fields.age,
+      },
+    });
+    message.success('添加成功');
+    this.handleModalVisible();//关闭弹窗
+    later.then(()=>{//刷新列表
+      this.componentDidMount();
+    })
+  };
+
+  handleUpdate = (fields: FormValueType) => {
+    const { dispatch } = this.props;
+    const later = dispatch({
+      type: 'listAndUserList/update',
+      payload: {
+        userid: fields.userid,
+        userName: fields.userName,
+        nickName: fields.nickName,
+        key: fields.key,
+        password: fields.password,
+        sex: fields.sex,
+        age: fields.age,
+        userStatus: fields.userStatus,
+      },
+    });
+
+    message.success('修改成功');
+    this.handleUpdateModalVisible();
+    later.then(()=>{//刷新列表
+      this.componentDidMount();
+    })
   };
 
   renderSimpleForm() {
@@ -254,21 +278,20 @@ class TableList extends Component<RelateManListProps, TableListState> {
     const { getFieldDecorator } = form;
     return (
       <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={{ md: 8, lg: 24, xl: 48 }}>
-          <Col md={8} sm={24}>
+        <Row gutter={24}>
+          <Col md={12} sm={24}>
             <FormItem label="快速查询">
-              {getFieldDecorator('userName')(<Input placeholder="姓名/工号" />)}
+              {getFieldDecorator('userName')(<Input placeholder="账号/用户姓名" />)}
             </FormItem>
           </Col>
-          <Col md={16} sm={24}>
+          <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
-              <Button icon="search"  type="primary" htmlType="submit">
-              </Button>
+              <Button type="primary" icon="search" htmlType="submit"/>
               &nbsp;&nbsp;&nbsp;
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               </Button>
               &nbsp;&nbsp;&nbsp;
-              <Button icon="delete" type="primary" onClick={this.handleMenuClick} />  
+              <Button icon="delete" type="primary" onClick={this.handleMenuClick} />
             </span>
           </Col>
         </Row>
@@ -280,54 +303,73 @@ class TableList extends Component<RelateManListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  backClick(){
-    history.goBack();
-  }
+  onRef = (ref) => {
+    this.child = ref
+}
+   // 选中行
+   onClickRow = (record: { userid: any; }) => {
+    return {
+      onClick: () => {
+        this.child.getRoles(record.userid);
+        this.setState({
+          userid:record.userid
+        })
+      },
+    };
+  };
 
-  
   render() {
     const {
-      listAndRelateManList: { data },
+      listAndUserList: { data },
       loading,
     } = this.props;
-    const { selectedRows } = this.state;
-    const { visible } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+
+    const parentMethods = {
+      handleAdd: this.handleAdd,
+      handleModalVisible: this.handleModalVisible,
+    };
+    const updateMethods = {
+      handleUpdateModalVisible: this.handleUpdateModalVisible,
+      handleUpdate: this.handleUpdate,
+    };
     return (
-      <>
-        <Collapse defaultActiveKey={['1']}>
-          <Panel header="相关人员" key="1">
-            <Card bordered={false}>
-              <div className={styles.tableList}>
-                <div className={styles.tableListForm}>{this.renderForm()}</div>
+      <Row gutter={24}>
+        <Col lg={12} md={24}>
+        用户名单 
+        <Card bordered={false}>
+          <div className={styles.tableList}>
+            <div className={styles.tableListForm}>{this.renderForm()}</div>
                 <StandardTable
-                  selectedRows={selectedRows}
-                  loading={loading}
-                  data={data}
-                  columns={this.columns}
-                  onSelectRow={this.handleSelectRows}
-                  onChange={this.handleStandardTableChange}
+                selectedRows={selectedRows}
+                loading={loading}
+                data={data}
+                columns={this.columns}
+                onSelectRow={this.handleSelectRows}
+                onChange={this.handleStandardTableChange}
+                onRow={this.onClickRow}
+                scroll={{ x: 1000 ,y:280}}
                 />
-              </div>
-            </Card>
-          </Panel>
-        </Collapse>
-        <RouteContext.Consumer>
-          { ()=> (
-            <FooterToolbar>
-              <Button type="primary" onClick={this.backClick}>
-                返回
-              </Button>
-            </FooterToolbar>
-          )}
-        </RouteContext.Consumer> 
-        <Add 
-          visible={visible} 
-          status={this.changeStatus}
-          refreshNode={this.refreshNode}
-        />
-      </>
+          </div> 
+        </Card>
+        <CreateForm {...parentMethods} modalVisible={modalVisible} />
+        {stepFormValues && Object.keys(stepFormValues).length ? (
+          <UpdateForm
+            {...updateMethods}
+            updateModalVisible={updateModalVisible}
+            values={stepFormValues}
+          /> 
+        ) : null}
+      </Col>
+      <Col lg={12} md={24}>
+                <RoleList 
+                  onRef={this.onRef}
+                  userid={this.state.userid}
+                />
+        </Col>
+      </Row>
     );
   }
 }
 
-export default Form.create<RelateManListProps>()(TableList);
+export default Form.create<TableListProps>()(TableList);
