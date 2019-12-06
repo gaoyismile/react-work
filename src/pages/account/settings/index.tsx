@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Dispatch } from 'redux';
 import { FormattedMessage } from 'umi-plugin-react/locale';
 import { GridContent } from '@ant-design/pro-layout';
-import { Menu } from 'antd';
+import { Menu,Modal } from 'antd';
 import { connect } from 'dva';
 import AdvancedForm from './components/workDesc';
 import WorkOrder from './components/workOrder';
@@ -137,8 +137,13 @@ class Settings extends Component<
     });
   };
 
+  cancelModal = () => {
+    this.props.status(false);
+  };
+
   renderChildren = () => {
-    const { selectKey,visible } = this.state;
+    const { selectKey } = this.state;
+    const {visible} = this.props;
     switch (selectKey) {
       case 'workDesc':
         return <AdvancedForm />;
@@ -159,7 +164,10 @@ class Settings extends Component<
       case 'qualityPlan':
         return <QualityPlan />;
       case 'relateMan':
-        return <RelateMan visible={visible}/>;
+        return <RelateMan 
+                  visible={visible} 
+                  cancelModal={this.cancelModal}
+               />;
       default:
         break;
     }
@@ -168,35 +176,48 @@ class Settings extends Component<
   };
 
   render() {
-    const { currentUser } = this.props;
+    const { currentUser,visible} = this.props;
     if (!currentUser.userid) {
       return '';
     }
     const { mode, selectKey } = this.state;
+    console.log("setting的visible:",visible);
     return (
-      <GridContent>
-        <div
-          className={styles.main}
-          ref={ref => {
-            if (ref) {
-              this.main = ref;
-            }
-          }}
-        >
-          <div className={styles.leftMenu}>
-            <Menu
-              mode={mode}
-              selectedKeys={[selectKey]}
-              onClick={({ key }) => this.selectKey(key as SettingsStateKeys)}
-            >
-              {this.getMenu()}
-            </Menu>
+      <Modal 
+        width="100%" 
+        visible={visible}
+        title="工作包编辑"
+        onCancel={this.cancelModal}
+        style={{ top:0 }}
+        zIndex={99}      
+        footer={
+          []
+        }
+      >
+        <GridContent>
+          <div
+            className={styles.main}
+            ref={ref => {
+              if (ref) {
+                this.main = ref;
+              }
+            }}
+          >
+            <div className={styles.leftMenu}>
+              <Menu
+                mode={mode}
+                selectedKeys={[selectKey]}
+                onClick={({ key }) => this.selectKey(key as SettingsStateKeys)}
+              >
+                {this.getMenu()}
+              </Menu>
+            </div>
+            <div className={styles.right}>
+              {this.renderChildren()}
+            </div>
           </div>
-          <div className={styles.right}>
-            {this.renderChildren()}
-          </div>
-        </div>
-      </GridContent>
+        </GridContent>
+      </Modal>
     );
   }
 }

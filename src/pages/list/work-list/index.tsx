@@ -63,6 +63,7 @@ interface TableListState {
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
   stepFormValues: Partial<TableListItem>;
+  visible: boolean;
 }
 
 /* eslint react/no-multi-comp:0 */
@@ -90,6 +91,7 @@ class TableList extends Component<TableListProps, TableListState> {
     selectedRows: [],
     formValues: {},
     stepFormValues: {},
+    visible: false,
   };
 
   columns: StandardTableColumnProps[] = [
@@ -289,15 +291,11 @@ class TableList extends Component<TableListProps, TableListState> {
     this.handleModalVisible();
   };
 
-  addItem = () => {
-    // const { dispatch } = this.props;
-    // dispatch(routerRedux.push({
-    //   pathname: `/account/settings`
-    // }))
+  addModalVisible = (flag?: boolean) => {
     this.setState({
-      visible: true,
+      visible: !!flag,
     });
-  }
+  };
   handleCancel = () => {
     this.setState({ visible: false });
   };
@@ -426,22 +424,23 @@ class TableList extends Component<TableListProps, TableListState> {
     return expandForm ? this.renderAdvancedForm() : this.renderSimpleForm();
   }
 
+  changeStatus = (status: any) =>{
+    this.setState({
+      visible:status
+    })
+  }
+
   render() {
     const {
       listAndWorkList: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+    const { selectedRows, updateModalVisible, stepFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>
         <Menu.Item key="remove">删除</Menu.Item>
       </Menu>
     );
-
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
-    };
     const updateMethods = {
       handleUpdateModalVisible: this.handleUpdateModalVisible,
       handleUpdate: this.handleUpdate,
@@ -453,7 +452,7 @@ class TableList extends Component<TableListProps, TableListState> {
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
             <div className={styles.tableListOperator}>
-              <Button icon="plus" type="primary" onClick={() => this.addItem ()}>
+              <Button icon="plus" type="primary" onClick={() => this.addModalVisible(true)}>
                 新建
               </Button>
               {selectedRows.length > 0 && (
@@ -480,7 +479,7 @@ class TableList extends Component<TableListProps, TableListState> {
           </div>
         </Card>
         <div className={styles.content}>
-            <Modal 
+            {/* <Modal 
                 width="100%"
                 visible={visible}
                 title="工作包编辑"
@@ -499,10 +498,13 @@ class TableList extends Component<TableListProps, TableListState> {
                 // </FooterToolbar>
                 }
               >
-                  <Settings/>
-              </Modal>
+                  <Settings
+                    visible={visible} 
+
+                  />
+              </Modal> */}
+              
         </div>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
         {stepFormValues && Object.keys(stepFormValues).length ? (
           <UpdateForm
             {...updateMethods}
@@ -510,7 +512,12 @@ class TableList extends Component<TableListProps, TableListState> {
             values={stepFormValues}
           />
         ) : null}
+        <Settings
+                  visible={visible}
+                  status={this.changeStatus} 
+              />
       </PageHeaderWrapper>
+      
     );
   }
 }

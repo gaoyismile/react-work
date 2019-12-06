@@ -245,10 +245,6 @@ class TableList extends Component<RelateManListProps, TableListState> {
     this.componentDidMount();
   }
 
-  handleCancel = () => {
-    this.setState({ visible: false });
-  };
-
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -280,8 +276,12 @@ class TableList extends Component<RelateManListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  backClick(){
-    history.goBack();
+  cancelModal = () => {
+    this.setState({ visible: false });
+  };
+
+  backClick = () =>{
+    this.props.cancelModal();//关闭当前弹窗
   }
 
   
