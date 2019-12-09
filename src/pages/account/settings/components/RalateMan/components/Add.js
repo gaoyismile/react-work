@@ -1,7 +1,6 @@
 import React from 'react';
 import { Col, Row,Modal } from 'antd';
 import Tree from './tree/Tree';
-import treeData from './tree.json';
 import styles from './style.less';
 import { GridContent } from '@ant-design/pro-layout';
 import { Dispatch, Action } from 'redux';
@@ -70,7 +69,10 @@ class TreeComponent extends React.Component {
       resultArray: newArray,
     });
   }
-  handleCancel = () => {
+  handleCancel = () => {//点击取消时,清空数组
+    this.setState({
+      resultArray:[]
+    })
     let status = false;
     this.props.status(status);
   };
@@ -79,7 +81,7 @@ class TreeComponent extends React.Component {
     const { visible} = this.props;
     return (
        <Modal 
-                width="100%"
+                width="100%"  
                 visible={visible}
                 title="选择用户"
                 onCancel={this.handleCancel}
@@ -101,7 +103,7 @@ class TreeComponent extends React.Component {
               deptId={this.state.deptId}
               setValue={this.setValue.bind(this)}
               resultArray={this.state.resultArray}
-              handleCancel={this.handleCancel}
+              handleCancel={() => this.handleCancel()}
               refreshNode={this.props.refreshNode}
             /> 
           </Col>

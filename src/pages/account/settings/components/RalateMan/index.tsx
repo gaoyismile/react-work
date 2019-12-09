@@ -101,10 +101,6 @@ class TableList extends Component<RelateManListProps, TableListState> {
       dataIndex: 'nickName',
     },
     {
-      title: '部门id',
-      dataIndex: 'deptId',
-    },
-    {
       title: '部门',
       dataIndex: 'deptName',
     },
@@ -196,7 +192,7 @@ class TableList extends Component<RelateManListProps, TableListState> {
     });
     later.then(()=>{// 删除之后页面要刷新，还得重新获取数据
       this.componentDidMount();
-    })
+    },1000)
   };
 
   handleSelectRows = (rows: TableListItem[]) => {

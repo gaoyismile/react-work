@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createTreeNodesArray, changeExpandStatus } from './tree.api';
-import './Tree.less';
-import './css/iconfont.css';
+import styles from './Tree.less';
+import iconStyles from'./css/iconfont.css';
+import { Icon } from 'antd';
 
 const TreeNodes = props => {
   const { treeNodes, rootNodeIndex, onNodeClick, render } = props;
@@ -25,12 +26,12 @@ const BranchNode = ({ branch, onNodeClick, treeNodes, level, render }) => {
   const isLeafNode = !children || children.length === 0;
   const iconClass = expanded ? 'icon-jiantou_xia' : 'icon-jiantou_you';
   return (
-    <li className={`${isLeafNode ? 'tree-leaf-node' : ''} tree-li`}>
+    <li className={styles.treeLeafNode}>
       <span
         onClick={e => onNodeClick(e, branch)}
-        className={` ${isLeafNode ? '' : 'branch-icon-text-container'} level${level}`}
+        className={styles.branchIconTextContainer}
       >
-        {!isLeafNode && <span className={`iconfont ${iconClass} branch-icon`} />}
+        {!isLeafNode && <span className={`iconfont ${iconClass} branch-icon`}><Icon type="caret-right" /></span>}
         <span>
           {render && typeof render === 'function'
             ? render({ node: branch, level, treeNodes })
@@ -38,7 +39,7 @@ const BranchNode = ({ branch, onNodeClick, treeNodes, level, render }) => {
         </span>
       </span>
       {expanded && !isLeafNode && (
-        <ul className="tree-branch-node">
+        <ul>
           {children.map(item => {
             const newBranch = treeNodes[item];
             if (!newBranch) return '';
@@ -95,7 +96,7 @@ const Tree = props => {
   if ((!rootNodeIndex && rootNodeIndex !== 0) || !treeNodeArr || !treeNodeArr.length) return '';
 
   return (
-    <ul className="tree-container">
+    <ul className={styles.treeContainer}>
       <TreeNodes
         rootNodeIndex={rootNodeIndex}
         treeNodes={treeNodeArr}

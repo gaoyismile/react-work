@@ -14,11 +14,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-jiantou_you:before {
+.iconJiantouYou:before {
   content: "\e635";
 }
 
-.icon-jiantou_xia:before {
+.iconJiantouXia:before {
   content: "\e636";
 }
 

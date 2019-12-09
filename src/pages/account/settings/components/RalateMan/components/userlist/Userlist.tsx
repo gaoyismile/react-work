@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, Row, message } from 'antd';
+import { Button, Col, Form, Input, Row } from 'antd';
 import React, { Component } from 'react';
 
 import { Dispatch, Action } from 'redux';
@@ -11,7 +11,6 @@ import StandardTable, { StandardTableColumnProps } from '../StandardTable';
 import { TableListItem, TableListPagination, TableListParams } from './userlistData';
 import { RouteContext } from '@ant-design/pro-layout';
 import FooterToolbar from '../../../FooterToolbar';
-import creatHistory from 'history/createHashHistory';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -19,8 +18,6 @@ const getValue = (obj: { [x: string]: string[] }) =>
   Object.keys(obj)
     .map(key => obj[key])
     .join(',');
-
-const history = creatHistory();
 
 interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<
@@ -279,14 +276,16 @@ class TableList extends Component<TableListProps, TableListState> {
       dispatch,
     } = this.props;
     const values = this.props.resultArray;
-    console.log("提交的value:",values);
     // submit the values
-    dispatch({
+    const later = dispatch({
       type: 'listAndDeptTreeList/submitArray',
       payload: values,
     });
-    this.props.handleCancel();//关闭当前弹窗
-    this.props.refreshNode();//局部刷新页面
+    later.then(()=>{
+      this.props.handleCancel();//关闭当前弹窗
+      this.props.refreshNode();//局部刷新页面
+    },1000)
+    
   };
 
   render() {
