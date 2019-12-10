@@ -1,7 +1,12 @@
 export interface TableListItem {
-  key: number,
-  projectid: number;
-  projectName: string;
+  key: number;
+  userid: number;
+  userName: string;
+  nickName: string;
+  deptId: number;
+  deptName: string;
+  deptRank: string;
+  createdAt: Date;
 }
 
 export interface TableListPagination {

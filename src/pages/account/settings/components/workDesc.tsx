@@ -120,7 +120,7 @@ class AdvancedForm extends Component<AdvancedFormProps> {
   }
 
   render() {
-    const {
+    const { 
       form: { getFieldDecorator },
       submitting,
     } = this.props;

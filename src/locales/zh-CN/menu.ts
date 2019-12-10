@@ -19,6 +19,7 @@ export default {
   'menu.角色管理': '角色管理',
   'menu.工作包管理': '工作包管理',
   'menu.advanced-form':'工作包表单',
+  'menu.基础详情页': '基础详情页',
   'menu.tabs':'工作包tabs',
   "menu.center": 'center',
   'menu.form.basic-form': '基础表单',

@@ -120,6 +120,7 @@ export default {
               icon: 'smile',
               path: '/account/center',
               component: './account/center',
+              hideInMenu: true,
             },
             {
               name: '用户管理附件',
@@ -145,6 +146,13 @@ export default {
               icon: 'smile',
               path: '/list/role-list',
               component: './list/role-list',
+            },
+            {
+              name: '项目-角色',
+              icon: 'smile',
+              path: '/list/role-list/components/roleList',
+              component: './list/role-list/components/roleList',
+              hideInMenu: true,
             },
             {
               name: '工作包管理',
@@ -207,6 +215,19 @@ export default {
               path: '/account/settings/components/RalateMan/components/userlist/Userlist',
               component: './account/settings/components/RalateMan/components/userlist/Userlist',
               hideInMenu: true,
+            },
+            {
+              name: 'role-user-list',
+              icon: 'smile',
+              path: '/list/role-list/components/roleList/components/add/userlist/Userlist',
+              component: './list/role-list/components/roleList/components/add/userlist/Userlist',
+              hideInMenu: true,
+            },
+            {
+              name: '基础详情页',
+              icon: 'smile',
+              path: '/profilebasic',
+              component: './ProfileBasic',
             },
             {
               component: './404',

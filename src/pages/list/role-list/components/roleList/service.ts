@@ -1,8 +1,8 @@
 import request from '@/utils/request';
-import { TableListParams } from './data.d';
+import { TableListParams } from './data';
 
 export async function queryRule(params: TableListParams) {
-  return request('/api/role/projects', {
+  return request('/api/role/getRolesByProject', {
     params,
   });
 }

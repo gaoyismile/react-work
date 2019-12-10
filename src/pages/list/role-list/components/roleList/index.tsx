@@ -14,12 +14,11 @@ import { FormComponentProps } from 'antd/es/form';
 import { SorterResult } from 'antd/es/table';
 import { connect } from 'dva';
 import { StateType } from './model';
-import CreateForm from './components/CreateForm';
 import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
-import { FormValueType } from './components/UpdateForm';
-import { TableListItem, TableListPagination, TableListParams } from './data.d';
-import RoleList from './components/roleList';
+import UpdateForm, { FormValueType } from './components/UpdateForm';
+import { TableListItem, TableListPagination, TableListParams } from './data';
 import styles from './style.less';
+import Add from './components/add/Add';
 
 const FormItem = Form.Item;
 const getValue = (obj: { [x: string]: string[] }) =>
@@ -30,14 +29,15 @@ const getValue = (obj: { [x: string]: string[] }) =>
 interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<
     Action<
-      | 'listAndRList/add'
-      | 'listAndRList/fetch'
-      | 'listAndRList/remove'
-      | 'listAndRList/update'
+      | 'listAndRoleList/add'
+      | 'listAndRoleList/fetch'
+      | 'listAndRoleList/remove'
+      | 'listAndRoleList/update'
     >
   >;
   loading: boolean;
-  listAndRList: StateType;
+  listAndRoleList: StateType;
+  projectid:number; 
 }
 
 interface TableListState {
@@ -45,25 +45,26 @@ interface TableListState {
   updateModalVisible: boolean;
   expandForm: boolean;
   selectedRows: TableListItem[];
+  visible: boolean;
   formValues: { [key: string]: string };
-  projectid:number;
+  stepFormValues: Partial<TableListItem>;
 }
 
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    listAndRList,
+    listAndRoleList,
     loading,
   }: {
-    listAndRList: StateType;
+    listAndRoleList: StateType;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    listAndRList,
-    loading: loading.models.listAndRList,
+    listAndRoleList,
+    loading: loading.models.listAndRoleList,
   }),
 )
 class TableList extends Component<TableListProps, TableListState> {
@@ -73,7 +74,8 @@ class TableList extends Component<TableListProps, TableListState> {
     expandForm: false,
     selectedRows: [],
     formValues: {},
-    projectid:'',
+    stepFormValues: {},
+    visible:false,
   };
 
   columns: StandardTableColumnProps[] = [
@@ -81,121 +83,47 @@ class TableList extends Component<TableListProps, TableListState> {
       title: '操作',
       render: (text, record) => (
         <Fragment>
-          <Button icon="search" />
+          <Button icon="search" onClick={this.handleMenuClick} />
+          <Button icon="edit" onClick={this.handleMenuClick} />
+          <Button icon="delete" onClick={this.handleMenuClick} />
         </Fragment>
       ),
-      width:20,
+      width:100,
+    },
+    {
+      title: '角色描述',
+      dataIndex: 'roleDesc',
+      width:130,
     },
     {
       title: '项目名称',
       dataIndex: 'projectName',
       width:200,
     },
+    {
+      title: '角色类别',
+      dataIndex: 'roleCategory',
+      width:200,
+    },
   ];
 
-  componentDidMount() {
-    const { dispatch } = this.props;
+  getRoles= (projectid: number) =>{
+    const { dispatch} = this.props;
     dispatch({
-      type: 'listAndRList/fetch',
+      type: 'listAndRoleList/fetch',
+      payload: {
+        projectid: projectid,
+      },
     });
   }
 
-  handleFormReset = () => {
-    const { form, dispatch } = this.props;
-    form.resetFields();
-    this.setState({
-      formValues: {},
-    });
-    dispatch({
-      type: 'listAndRList/fetch',
-      payload: {},
-    });
-  };
-
-  toggleForm = () => {
-    const { expandForm } = this.state;
-    this.setState({
-      expandForm: !expandForm,
-    });
-  };
-
-  handleSelectRows = (rows: TableListItem[]) => {
-    this.setState({
-      selectedRows: rows,
-    });
-  };
-
-  handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const { dispatch, form } = this.props;
-
-    form.validateFields((err, fieldsValue) => {
-      if (err) return;
-
-      const values = {
-        ...fieldsValue,
-        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-      };
-
-      this.setState({
-        formValues: values,
-      });
-
-      dispatch({
-        type: 'listAndRList/fetch',
-        payload: values,
-      });
-    });
-  };
-
-  handleModalVisible = (flag?: boolean) => {
-    this.setState({
-      modalVisible: !!flag,
-    });
-  };
-
-  handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
-    const { dispatch } = this.props;
-    const later = dispatch({
-      type: 'listAndRList/add',
-      payload: {
-        userName: fields.userName,
-        password: fields.password,
-        nickName: fields.nickName,
-        sex: fields.sex,
-        age: fields.age,
-      },
-    });
-    message.success('添加成功');
-    this.handleModalVisible();//关闭弹窗
-    later.then(()=>{//刷新列表
-      this.componentDidMount();
-    })
-  };
-
-  handleUpdate = (fields: FormValueType) => {
-    const { dispatch } = this.props;
-    const later = dispatch({
-      type: 'listAndRList/update',
-      payload: {
-        userid: fields.userid,
-        userName: fields.userName,
-        nickName: fields.nickName,
-        key: fields.key,
-        password: fields.password,
-        sex: fields.sex,
-        age: fields.age,
-        userStatus: fields.userStatus,
-      },
-    });
-
-    message.success('修改成功');
-    this.handleUpdateModalVisible();
-    later.then(()=>{//刷新列表
-      this.componentDidMount();
-    })
-  };
+  componentDidMount() {
+    // const { dispatch } = this.props;
+    // dispatch({
+    //   type: 'listAndRoleList/fetch',
+    // });
+    this.props.onRef(this);
+  }
 
   handleStandardTableChange = (
     pagination: Partial<TableListPagination>,
@@ -214,6 +142,7 @@ class TableList extends Component<TableListProps, TableListState> {
     const params: Partial<TableListParams> = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
+      projectid: this.props.projectid,
       ...formValues,
       ...filters,
     };
@@ -222,9 +151,140 @@ class TableList extends Component<TableListProps, TableListState> {
     }
 
     dispatch({
-      type: 'listAndRList/fetch',
+      type: 'listAndRoleList/fetch',
       payload: params,
     });
+  };
+
+  handleFormReset = () => {
+    const { form, dispatch } = this.props;
+    form.resetFields();
+    this.setState({
+      formValues: {},
+    });
+    dispatch({
+      type: 'listAndRoleList/fetch',
+      payload: {},
+    });
+  };
+
+  toggleForm = () => {
+    const { expandForm } = this.state;
+    this.setState({
+      expandForm: !expandForm,
+    });
+  };
+
+  handleMenuClick = () => {
+    const { dispatch } = this.props;
+    const { selectedRows } = this.state;
+    if (!selectedRows){
+      return;
+    }
+    if (selectedRows==null || selectedRows.length<1){
+      alert("请至少选择一项");
+      return;
+    }
+    const later =dispatch({
+      type: 'listAndRoleList/remove',
+      payload: {
+        key: selectedRows.map(row => row.key),
+      },
+      callback: () => {
+        this.setState({
+          selectedRows: [],
+        });
+      },
+    });
+    later.then(()=>{// 删除之后页面要刷新，还得重新获取数据
+      this.componentDidMount();
+    })
+  };
+
+  handleSelectRows = (rows: TableListItem[]) => {
+    this.setState({
+      selectedRows: rows,
+    });
+  };
+
+  handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const { dispatch, form } = this.props;
+
+    form.validateFields((err, fieldsValue) => {
+      if (err) return;
+
+      const values = {
+        ...fieldsValue, 
+        updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+        projectid: this.props.projectid
+      };
+
+      this.setState({
+        formValues: values,
+      });
+
+      dispatch({
+        type: 'listAndRoleList/fetch',
+        payload: values,
+      });
+    });
+  };
+
+  handleModalVisible = (flag?: boolean) => {
+    this.setState({
+      visible: !!flag,
+    });
+  };
+
+  handleUpdateModalVisible = (flag?: boolean, record?: FormValueType) => {
+    this.setState({
+      updateModalVisible: !!flag,
+      stepFormValues: record || {},
+    });
+  };
+
+  handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
+    const { dispatch } = this.props;
+    const later = dispatch({
+      type: 'listAndRoleList/add',
+      payload: {
+        userName: fields.userName,
+        password: fields.password,
+        nickName: fields.nickName,
+        sex: fields.sex,
+        age: fields.age,
+      },
+    });
+    message.success('添加成功');
+    this.handleModalVisible();//关闭弹窗
+    later.then(()=>{//刷新列表
+      this.componentDidMount();
+    })
+  };
+
+  handleUpdate = (fields: FormValueType) => {
+    const { dispatch } = this.props;
+    const later = dispatch({
+      type: 'listAndRoleList/update',
+      payload: {
+        projectid: fields.projectid,
+        userName: fields.userName,
+        nickName: fields.nickName,
+        key: fields.key,
+        password: fields.password,
+        sex: fields.sex,
+        age: fields.age,
+        userStatus: fields.userStatus,
+      },
+    });
+
+    message.success('修改成功');
+    this.handleUpdateModalVisible();
+    later.then(()=>{//刷新列表
+      this.componentDidMount();
+    })
   };
 
   renderSimpleForm() {
@@ -235,7 +295,7 @@ class TableList extends Component<TableListProps, TableListState> {
         <Row gutter={24}>
           <Col md={12} sm={24}>
             <FormItem label="快速查询">
-              {getFieldDecorator('userName')(<Input placeholder="账号/用户姓名" />)}
+              {getFieldDecorator('roleDesc')(<Input placeholder="角色描述" />)}
             </FormItem>
           </Col>
           <Col md={8} sm={24}>
@@ -244,8 +304,6 @@ class TableList extends Component<TableListProps, TableListState> {
               &nbsp;&nbsp;&nbsp;
               <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
               </Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button icon="delete" type="primary" onClick={this.handleMenuClick} />
             </span>
           </Col>
         </Row>
@@ -257,60 +315,56 @@ class TableList extends Component<TableListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  onRef = (ref) => {
-    this.child = ref
-}
-   // 选中行
-   onClickRow = (record: { projectid: any; }) => {
-    return {
-      onClick: () => {
-        this.child.getRoles(record.projectid);
-        this.setState({
-          projectid:record.projectid
-        })
-      },
-    };
-  };
+  changeStatus = (status: any) =>{
+    this.setState({
+      visible:status
+    })
+  }
 
+  refreshNode = () =>{
+    this.componentDidMount();
+  }
   render() {
     const {
-      listAndRList: { data },
+      listAndRoleList: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible } = this.state;
-
-    const parentMethods = {
-      handleAdd: this.handleAdd,
-      handleModalVisible: this.handleModalVisible,
+    const { selectedRows, visible, updateModalVisible, stepFormValues } = this.state;
+    const updateMethods = {
+      handleUpdateModalVisible: this.handleUpdateModalVisible,
+      handleUpdate: this.handleUpdate,
     };
     return (
-      <Row gutter={24}>
-        <Col lg={8} md={24}>
-        项目列表 
+      <div>       
+        角色信息 
         <Card bordered={false}>
           <div className={styles.tableList}>
+            <div className={styles.tableListForm}>{this.renderForm()}</div>
                 <StandardTable
-                rowKey={record => record.projectid}
+                rowKey={record => record.roleid}
                 selectedRows={selectedRows}
                 loading={loading}
                 data={data}
                 columns={this.columns}
                 onSelectRow={this.handleSelectRows}
-                pagination={false}
                 onChange={this.handleStandardTableChange}
-                onRow={this.onClickRow}
+                scroll={{ x: 1000 ,y:280}}
                 />
-          </div> 
+          </div>  
         </Card>
-        <CreateForm {...parentMethods} modalVisible={modalVisible} />
-      </Col>
-      <Col lg={16} md={24}>
-                <RoleList 
-                  onRef={this.onRef}
-                  projectid={this.state.projectid}
-                />
-        </Col>
-      </Row>
+        <Add 
+          visible={visible} 
+          status={this.changeStatus}
+          refreshNode={this.refreshNode}
+        />
+        {stepFormValues && Object.keys(stepFormValues).length ? (
+          <UpdateForm
+            {...updateMethods}
+            updateModalVisible={updateModalVisible}
+            values={stepFormValues}
+          />
+        ) : null}
+    </div>   
     );
   }
 }
