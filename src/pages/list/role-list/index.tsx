@@ -73,7 +73,7 @@ class TableList extends Component<TableListProps, TableListState> {
     expandForm: false,
     selectedRows: [],
     formValues: {},
-    projectid:'',
+    projectid:0,
   };
 
   columns: StandardTableColumnProps[] = [
@@ -272,6 +272,9 @@ class TableList extends Component<TableListProps, TableListState> {
     };
   };
 
+  refreshNode = () =>{
+    this.componentDidMount();
+  }
   render() {
     const {
       listAndRList: { data },

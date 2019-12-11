@@ -8,7 +8,7 @@ export async function queryRule(params: TableListParams) {
 }
 
 export async function submitUserArray(params: any) {
-  return request('/api/submitUserDeptTree', {
+  return request('/api/role/submit', {
     method: 'POST',
     data: params,
   });

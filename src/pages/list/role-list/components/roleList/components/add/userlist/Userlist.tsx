@@ -298,6 +298,7 @@ class TableList extends Component<TableListProps, TableListState> {
         <div className={styles.tableList}>
           <div className={styles.tableListForm}>{this.renderForm()}</div>
           <StandardTable
+            rowKey={record => record.userid}
             selectedRows={selectedRows}
             loading={loading}
             data={data}

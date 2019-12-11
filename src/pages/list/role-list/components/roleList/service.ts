@@ -8,7 +8,7 @@ export async function queryRule(params: TableListParams) {
 }
 
 export async function removeRule(params: TableListParams) {
-  return request('/api/rule/delete', {
+  return request('/api/role/delete', {
     method: 'POST',
     data: {
       ...params,

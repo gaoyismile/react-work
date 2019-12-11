@@ -1,18 +1,76 @@
-import React from 'react';
-import { Col, Row,Modal,Collapse,Form,Input,Select } from 'antd';
+import React, { Component } from 'react';
+import { Col, Row,Modal,Collapse,Form,Input,Select,Button,Icon,Popover } from 'antd';
 import Tree from './tree/Tree';
 import styles from './style.less';
 import { GridContent } from '@ant-design/pro-layout';
 import { Dispatch, Action } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
+import { RouteContext } from '@ant-design/pro-layout';
+import FooterToolbar from '../../../../../../account/settings/components/FooterToolbar';
+import { StateType } from './userlist/model';
+import { connect } from 'dva';
 
 import Userlist from './userlist/Userlist';
 
 const { Panel } = Collapse;
 const { Option } = Select;
 
-class TreeComponent extends React.Component {
-  constructor(props) {
+const FormItem = Form.Item;
+const getValue = (obj: { [x: string]: string[] }) =>
+  Object.keys(obj)
+    .map(key => obj[key])
+    .join(',');
+
+interface TableListProps extends FormComponentProps {
+  dispatch: Dispatch<
+    Action<
+      | 'listAndRoleUserList/add'
+      | 'listAndRoleUserList/fetch'
+      | 'listAndRoleUserList/remove'
+      | 'listAndRoleUserList/update'
+      | 'listAndRoleUserList/submitArray'
+    >
+  >;
+  loading: boolean;
+  listAndRoleUserList: StateType;
+  deptId: string;
+  setValue: [];
+  submitting: boolean;
+  resultArray:[];
+}
+
+interface TableListState {
+  modalVisible: boolean;
+  visible: boolean;
+  updateModalVisible: boolean;
+  expandForm: boolean;
+  formValues: { [key: string]: string };
+  resultArray:[];
+}
+
+@connect(
+  ({
+    listAndRoleUserList,
+    loading,
+  }: {
+    listAndRoleUserList: StateType;
+    loading: {
+      models: {
+        [key: string]: boolean;
+      };
+      effects: {
+        [key: string]: boolean;
+      };
+    };
+  }) => ({
+    listAndRoleUserList,
+    loading: loading.models.listAndRoleUserList,
+    submitting: loading.effects['listAndRoleUserList/submitArray'],
+
+  }),
+)
+class TreeComponent extends Component<TableListProps,TableListState> {
+  constructor(props: Readonly<{}>) {
     super(props);
     this.state = {
       objectData: {},
@@ -32,7 +90,7 @@ class TreeComponent extends React.Component {
     if (!errors || errorCount === 0) {
       return null;
     }
-    const scrollToField = (fieldKey) => {
+    const scrollToField = (fieldKey: string) => {
       const labelNode = document.querySelector(`label[for="${fieldKey}"]`);
       if (labelNode) {
         labelNode.scrollIntoView(true);
@@ -47,7 +105,7 @@ class TreeComponent extends React.Component {
         <li key={key} className={styles.errorListItem} onClick={() => scrollToField(key)}>
           <Icon type="cross-circle-o" className={styles.errorIcon} />
           <div className={styles.errorMessage}>{errorMessage[0]}</div>
-          <div className={styles.errorField}>{fieldLabels[key]}</div>
+          <div className={styles.errorField}></div>
         </li>
       );
     });
@@ -75,14 +133,14 @@ class TreeComponent extends React.Component {
       
   }
 
-  onNodeClick = (e, node) => {
+  onNodeClick = (e: any, node: { id: any; }) => {
     this.setState({ deptId: node.id });
   };
 
-  setValue(event) {
+  setValue(event: any[]) {
     var newArray = this.state.resultArray;
     var flag = true;
-    newArray.forEach(element => {
+    newArray.forEach((element: any[]) => {
       if (event[1] == element[1]) {
         flag = false;
       }
@@ -95,7 +153,7 @@ class TreeComponent extends React.Component {
       resultArray: newArray,
     });
   }
-  removeArray(index) {
+  removeArray(index: any) {
     var newArray = this.state.resultArray;
     newArray.splice(index, 1);
     this.setState({
@@ -106,22 +164,48 @@ class TreeComponent extends React.Component {
     this.setState({
       resultArray:[]
     })
+    this.props.form.resetFields();//重置表单信息
     let status = false;
     this.props.status(status);
   };
 
-  handleSubmit(e){
-    e.preventDefault();
-    console.log('data of form:',this.props.form.getFieldsValue());
-    //alert(this.props.form.getFieldValue('userName')+"-"+this.props.form.getFieldValue('passWord')+"-"+this.props.form.getFieldValue('agreement'));
+  validate = () => {
+    const {
+      dispatch,
+      form: { validateFieldsAndScroll },
+    } = this.props;
+    const values = this.state.resultArray;
+    var submitArray: any[] | never[] = [];
+    values.forEach((element: any[]) => {
+        submitArray.push(element[1]);
+    });
+    validateFieldsAndScroll((error: any, formValues: any) => {
+      if (!error) {
+         // submit the values
+        const later = dispatch({
+          type: 'listAndRoleUserList/submitArray',
+          payload: {
+            formValue:formValues,
+            tableValue:submitArray,
+            projectid:this.props.projectid,
+          },
+        });
+        later.then(()=>{
+          this.handleCancel();//关闭当前弹窗
+          this.props.refreshNode();//局部刷新页面
+        },1000)
+      }
+    });
+   
+    
   };
 
   render() {
     const { 
       visible, 
       form: { getFieldDecorator },
+      submitting,
     } = this.props;
-    console.log("getFieldDecorator的值:",getFieldDecorator.getFieldsValue);
     const formItemLayout = {
       labelCol: {
           span: 6
@@ -146,16 +230,18 @@ class TreeComponent extends React.Component {
           <Col lg={12} md={24}>
             <Collapse defaultActiveKey={['1']}>
               <Panel header="角色信息" key="1">
-              <Form layout="horizontal" onSubmit={this.handleSubmit} hideRequiredMark>
+              <Form layout="horizontal" hideRequiredMark>
                 <Col span={12}>
                   <Form.Item label="角色描述" {...formItemLayout}>
                     {getFieldDecorator('roleDesc', {
+                      rules: [{ required: true, message: '请输入角色描述' }],
                     })(<Input placeholder="请输入角色描述" />)}
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <Form.Item label="角色类别" {...formItemLayout}>
                     {getFieldDecorator('roleCategory', {
+                      rules: [{ required: true, message: '请选择角色类别' }],
                       })(
                         <Select placeholder="请选择角色类别">
                           <Option value="菜单角色">菜单角色</Option>
@@ -174,10 +260,10 @@ class TreeComponent extends React.Component {
               <Panel header="已选择[双击移除]" key="1">
                 <Row gutter={[24, 12]}>
                   {this.state.resultArray.map(
-                    function(strs, index) {
+                    function(strs: React.ReactNode[], index: any) {
                         return (
                             <Col span={12}>
-                              <div className={styles.removeDiv} onClick={this.removeArray.bind(this, index)}>{strs[2]}</div>
+                              <div key={index} className={styles.removeDiv} onClick={this.removeArray.bind(this, index)}>{strs[2]}</div>
                             </Col>    
                         );          
                     }.bind(this),
@@ -211,10 +297,23 @@ class TreeComponent extends React.Component {
             </Collapse>
           </Col>
         </Row>
+        <RouteContext.Consumer>
+          {() => (
+            <FooterToolbar>
+              {this.getErrorInfo()}
+              <Button type="primary" onClick={this.validate} loading={submitting}>
+                提交
+              </Button>
+              <Button type="primary" onClick={this.handleCancel}>
+                返回
+              </Button>
+            </FooterToolbar>
+          )}
+        </RouteContext.Consumer>
       </GridContent>
       </Modal> 
     );
   }
 }
 
-export default Form.create()(TreeComponent);
+export default Form.create<TableListProps>()(TreeComponent);
