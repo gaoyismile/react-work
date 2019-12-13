@@ -23,7 +23,7 @@ class TreeComponent extends React.Component {
 
   componentDidMount() {
     var t = this;
-    fetch("/api/getTreeJson", {method: 'GET'}).then(
+    fetch("/api/getTreeJson?id=0", {method: 'GET'}).then(
       function (res) {
           res.json().then(function (data) {
                   var dataJson = JSON.stringify(data.objectData);
@@ -47,9 +47,7 @@ class TreeComponent extends React.Component {
     //const newArray = this.state.resultArray.push(event);
     var newArray = this.state.resultArray;
     var flag = true;
-    console.log("event:",event);
     newArray.forEach(element => {
-      console.log('element:', element);
       if (event[1] == element[1]) {
         flag = false;
       }
@@ -113,7 +111,7 @@ class TreeComponent extends React.Component {
           {this.state.resultArray.map(
             function(strs, index) {
               return (
-                <Col lg={4} md={24}>
+                <Col lg={4} md={24} key={index}>
                   <div className={styles.removeDiv} onClick={this.removeArray.bind(this, index)}>{strs[0]}</div>
                 </Col>
               );

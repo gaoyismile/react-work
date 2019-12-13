@@ -5,17 +5,22 @@ import {
   Form,
   Input,
   Row,
+  Modal,
+  message,
 } from 'antd';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import { Dispatch, Action } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
 import { SorterResult } from 'antd/es/table';
 import { connect } from 'dva';
 import { StateType } from './model';
-import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
-import { TableListItem, TableListPagination, TableListParams } from './data.d';
-import RoleList from './components/roleList';
+import StandardTable, { StandardTableColumnProps } from '../StandardTable';
+import { TableListItem, TableListPagination, TableListParams } from './data';
+import Tree from './tree/Tree';
+import treeStyles from './tree/Tree.less';
+
+//import RoleList from './components/roleList';
 import styles from './style.less';
 
 const FormItem = Form.Item;
@@ -27,14 +32,14 @@ const getValue = (obj: { [x: string]: string[] }) =>
 interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<
     Action<
-      | 'listAndRList/add'
-      | 'listAndRList/fetch'
-      | 'listAndRList/remove'
-      | 'listAndRList/update'
+      | 'listAndUserDeptList/add'
+      | 'listAndUserDeptList/fetch'
+      | 'listAndUserDeptList/remove'
+      | 'listAndUserDeptList/update'
     >
   >;
   loading: boolean;
-  listAndRList: StateType;
+  listAndUserDeptList: StateType;
 }
 
 interface TableListState {
@@ -44,23 +49,25 @@ interface TableListState {
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
   projectid:number;
+  objectData: {},
+  deptid:number,
 }
 
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    listAndRList,
+    listAndUserDeptList,
     loading,
   }: {
-    listAndRList: StateType;
+    listAndUserDeptList: StateType;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    listAndRList,
-    loading: loading.models.listAndRList,
+    listAndUserDeptList,
+    loading: loading.models.listAndUserDeptList,
   }),
 )
 class TableList extends Component<TableListProps, TableListState> {
@@ -71,30 +78,40 @@ class TableList extends Component<TableListProps, TableListState> {
     selectedRows: [],
     formValues: {},
     projectid:0,
+    objectData: {},
+    deptid:0,
   };
 
   columns: StandardTableColumnProps[] = [
     {
-      title: '操作',
-      render: (text, record) => (
-        <Fragment>
-          <Button icon="search" />
-        </Fragment>
-      ),
-      width:20,
-    },
-    {
       title: '项目名称',
       dataIndex: 'projectName',
-      width:200,
+      width:400,
     },
   ];
 
   componentDidMount() {
+    var t = this;
+    fetch("/api/getTreeJson?id=0", {method: 'GET'}).then(
+      function (res) {
+          res.json().then(function (data) {
+                  var dataJson = JSON.stringify(data.objectData);
+                  var datas = dataJson.substring(1,dataJson.length-1);
+                  t.setState({
+                    objectData: JSON.parse(datas)
+                  });
+              }
+          )
+      });
+      this.props.onProjectRef(this);
+  }
+
+  getRestProjects= () =>{
     const { dispatch } = this.props;
-    dispatch({
-      type: 'listAndRList/fetch',
-    });
+      dispatch({
+        type: 'listAndUserDeptList/fetch',
+      });
+
   }
 
   handleFormReset = () => {
@@ -104,7 +121,7 @@ class TableList extends Component<TableListProps, TableListState> {
       formValues: {},
     });
     dispatch({
-      type: 'listAndRList/fetch',
+      type: 'listAndUserDeptList/fetch',
       payload: {},
     });
   };
@@ -140,7 +157,7 @@ class TableList extends Component<TableListProps, TableListState> {
       });
 
       dispatch({
-        type: 'listAndRList/fetch',
+        type: 'listAndUserDeptList/fetch',
         payload: values,
       });
     });
@@ -177,7 +194,7 @@ class TableList extends Component<TableListProps, TableListState> {
     }
 
     dispatch({
-      type: 'listAndRList/fetch',
+      type: 'listAndUserDeptList/fetch',
       payload: params,
     });
   };
@@ -219,30 +236,68 @@ class TableList extends Component<TableListProps, TableListState> {
    onClickRow = (record: { projectid: any; }) => {
     return {
       onClick: () => {
-        this.child.getRoles(record.projectid);
-        this.setState({
-          projectid:record.projectid
-        })
+        // this.child.getRoles(record.projectid);
+        // this.setState({
+        //   projectid:record.projectid
+        // })
       },
     };
   };
 
-  refreshNode = () =>{
-    this.componentDidMount();
-  }
+  onNodeClick = (e: any, node: { id: any; name: any; }) => {
+    console.info('TreeTest---onNodeClick---', node);
+    this.setState({ deptid: node.id });
+    //node.id === 6 ? this.refs.clickNodeStyles.style.backgroundColor = 'blanchedalmond':'1';
+    // let className;
+    // node.id === 1 ? className = 'clickBackgroud':'1';
+    // return className;
+  };
+  
+  handleCancel = () => {//点击取消
+    let status = false;
+    this.props.status(status);
+  };
+
+  okHandle = () => {
+    const { dispatch } = this.props;
+    const { deptid } = this.state;
+    const later = dispatch({
+      type: 'listAndUserDeptList/add',
+      payload: {
+        userid:this.props.userid,
+        deptid: deptid,   
+      },
+    });
+    message.success('添加成功');
+    this.handleCancel();//关闭弹窗
+    later.then(()=>{//刷新列表
+      this.props.refreshUser();//局部刷新页面
+    })
+  
+};
+
   render() {
     const {
-      listAndRList: { data },
+      listAndUserDeptList: { data },
       loading,
+      deptModalVisible,
     } = this.props;
     const { selectedRows } = this.state;
     return (
+      <Modal
+        destroyOnClose
+        title="选择部门"
+        style={{ top: 20 }}
+        width="80%"
+        visible={deptModalVisible}
+        onOk={this.okHandle}
+        onCancel={this.handleCancel}
+      >
       <Row gutter={24}>
         <Col lg={8} md={24}>
-        项目列表 
-        <Card bordered={false}>
-          <div className={styles.tableList}>
-                <StandardTable
+          <Card bordered={false}>
+            <div className={styles.tableList}>
+              <StandardTable
                 rowKey={record => record.projectid}
                 selectedRows={selectedRows}
                 loading={loading}
@@ -252,17 +307,21 @@ class TableList extends Component<TableListProps, TableListState> {
                 pagination={false}
                 onChange={this.handleStandardTableChange}
                 onRow={this.onClickRow}
-                />
-          </div> 
-        </Card>
-      </Col>
+              />
+            </div> 
+          </Card>
+        </Col>
       <Col lg={16} md={24}>
-                <RoleList 
+                {/* <RoleList 
                   onRef={this.onRef}
                   projectid={this.state.projectid}
-                />
+                /> */}
+          <div ref='clickNodeStyles'>
+            <Tree onNodeClick={this.onNodeClick.bind(this)} treeNodes={this.state.objectData} />
+          </div>    
         </Col>
       </Row>
+      </Modal>
     );
   }
 }

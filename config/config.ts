@@ -231,6 +231,13 @@ export default {
               hideInMenu: true,
             },
             {
+              name: 'user-dept-add-list',
+              icon: 'smile',
+              path: '/list/user-list/components/dept/dept',
+              component: './list/user-list/components/dept/dept',
+              hideInMenu: true,
+            },
+            {
               name: '基础详情页',
               icon: 'smile',
               path: '/profilebasic',

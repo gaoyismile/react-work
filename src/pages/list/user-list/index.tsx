@@ -19,6 +19,7 @@ import StandardTable, { StandardTableColumnProps } from './components/StandardTa
 import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TableListItem, TableListPagination, TableListParams } from './data.d';
 import RoleList from './components/roleList';
+import Dept from './components/dept/dept';
 import styles from './style.less';
 
 const FormItem = Form.Item;
@@ -42,6 +43,7 @@ interface TableListProps extends FormComponentProps {
 
 interface TableListState {
   modalVisible: boolean;
+  deptModalVisible: boolean;
   updateModalVisible: boolean;
   expandForm: boolean;
   selectedRows: TableListItem[];
@@ -70,6 +72,7 @@ interface TableListState {
 class TableList extends Component<TableListProps, TableListState> {
   state: TableListState = {
     modalVisible: false,
+    deptModalVisible: false,
     updateModalVisible: false,
     expandForm: false,
     selectedRows: [],
@@ -224,6 +227,17 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
+  handleDeptModalVisible = (flag?: boolean) => {
+    if(this.state.userid<1){
+      alert("请先选择用户");
+      return false;
+    }
+    this.setState({
+      deptModalVisible: !!flag,
+    });
+    this.projectChild.getRestProjects();
+  };
+
   handleUpdateModalVisible = (flag?: boolean, record?: FormValueType) => {
     this.setState({
       updateModalVisible: !!flag,
@@ -291,7 +305,7 @@ class TableList extends Component<TableListProps, TableListState> {
               <Button icon="user-add" type="primary" onClick={() => this.handleModalVisible(true)}>
               </Button>
               &nbsp;&nbsp;&nbsp;
-              <Button icon="drag" type="primary" onClick={this.handleMenuClick} />
+              <Button icon="drag" type="primary" onClick={() => this.handleDeptModalVisible(true)} />
             </span>
           </Col>
         </Row>
@@ -303,9 +317,14 @@ class TableList extends Component<TableListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  onRef = (ref) => {
+  onRef = (ref: any) => {
     this.child = ref
-}
+  }
+
+  onProjectRef = (ref: any) => {
+    this.projectChild = ref
+  }
+
    // 选中行
    onClickRow = (record: { userid: any; }) => {
     return {
@@ -324,12 +343,22 @@ class TableList extends Component<TableListProps, TableListState> {
     return className;
   }
 
+  changeStatus = (status: any) =>{
+    this.setState({
+      deptModalVisible:status
+    })
+  }
+
+  refreshUser = () =>{
+    this.componentDidMount();
+  }
+
   render() {
-    const {
+    const { 
       listAndUserList: { data },
       loading,
     } = this.props;
-    const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
+    const { selectedRows, modalVisible, updateModalVisible, stepFormValues,deptModalVisible } = this.state;
 
     const parentMethods = {
       handleAdd: this.handleAdd,
@@ -367,6 +396,14 @@ class TableList extends Component<TableListProps, TableListState> {
             values={stepFormValues}
           /> 
         ) : null}
+        <Dept  
+          deptModalVisible={deptModalVisible} 
+          status={this.changeStatus}
+          userid={this.state.userid}
+          refreshUser={this.refreshUser}
+          onProjectRef={this.onProjectRef}
+          //getRoles={this.getRoles}
+        />
       </Col>
       <Col lg={12} md={24}>
                 <RoleList 
@@ -374,7 +411,9 @@ class TableList extends Component<TableListProps, TableListState> {
                   userid={this.state.userid}
                 />
         </Col>
+        
       </Row>
+      
     );
   }
 }
