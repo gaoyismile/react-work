@@ -92,11 +92,11 @@ const defaultFooterDom = (
 
 const footerRender: BasicLayoutProps['footerRender'] = () => {
   if (!isAntDesignPro()) {
-    return null;
+    return defaultFooterDom;
   }
   return (
     <>
-      {/* {defaultFooterDom} */}
+      {defaultFooterDom}
       <div
         style={{
           padding: '0px 24px 24px',
@@ -152,7 +152,7 @@ const BasicLayout: React.FC<BasicLayoutProps> = props => {
       logo={logo}
       onCollapse={handleMenuCollapse}
       menuItemRender={(menuItemProps, defaultDom) => {
-        if (menuItemProps.isUrl) {
+        if (menuItemProps.isUrl || menuItemProps.children) {
           return defaultDom;
         }
         return <Link to={menuItemProps.path}>{defaultDom}</Link>;

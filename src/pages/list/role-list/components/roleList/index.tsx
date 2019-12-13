@@ -98,16 +98,19 @@ class TableList extends Component<TableListProps, TableListState> {
     {
       title: '角色描述',
       dataIndex: 'roleDesc',
+      sorter: true,
       width:130,
     },
     {
       title: '项目名称',
       dataIndex: 'projectName',
+      sorter: true,
       width:200,
     },
     {
       title: '角色类别',
       dataIndex: 'roleCategory',
+      sorter: true,
       width:200,
     },
   ];
@@ -179,11 +182,10 @@ class TableList extends Component<TableListProps, TableListState> {
       expandForm: !expandForm,
     });
   };
-
+ 
   handleMenuClick = () => {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
-    console.log("当前选择行roleid:",selectedRows);
     if (!selectedRows){
       return;
     }

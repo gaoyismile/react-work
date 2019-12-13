@@ -47,7 +47,7 @@ interface TableListState {
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
   stepFormValues: Partial<TableListItem>;
-  userid:'',
+  userid:number,
 }
 
 /* eslint react/no-multi-comp:0 */
@@ -75,7 +75,7 @@ class TableList extends Component<TableListProps, TableListState> {
     selectedRows: [],
     formValues: {},
     stepFormValues: {},
-    userid:null,
+    userid:0,
   };
 
   columns: StandardTableColumnProps[] = [
@@ -288,10 +288,10 @@ class TableList extends Component<TableListProps, TableListState> {
             <span className={styles.submitButtons}>
               <Button type="primary" icon="search" htmlType="submit"/>
               &nbsp;&nbsp;&nbsp;
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
+              <Button icon="user-add" type="primary" onClick={() => this.handleModalVisible(true)}>
               </Button>
               &nbsp;&nbsp;&nbsp;
-              <Button icon="delete" type="primary" onClick={this.handleMenuClick} />
+              <Button icon="drag" type="primary" onClick={this.handleMenuClick} />
             </span>
           </Col>
         </Row>
@@ -317,6 +317,12 @@ class TableList extends Component<TableListProps, TableListState> {
       },
     };
   };
+
+  setRowClassName = (record: { userid: any; }) => {
+    let className;
+    record.userid === this.state.userid ? className = 'clickRowStyle':'1';
+    return className;
+  }
 
   render() {
     const {
@@ -348,6 +354,7 @@ class TableList extends Component<TableListProps, TableListState> {
                 onSelectRow={this.handleSelectRows}
                 onChange={this.handleStandardTableChange}
                 onRow={this.onClickRow}
+                rowClassName={this.setRowClassName}
                 scroll={{ x: 1000 ,y:280}}
                 />
           </div> 

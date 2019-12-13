@@ -2,7 +2,7 @@ import request from '@/utils/request';
 import { TableListParams } from './data';
 
 export async function queryRule(params: TableListParams) {
-  return request('/api/getRolesByUser', {
+  return request('/api/role/getRestRoles', {
     params,
   });
 }
@@ -18,7 +18,7 @@ export async function removeRule(params: TableListParams) {
 }
 
 export async function addRule(params: TableListParams) {
-  return request('/api/rule/add', {
+  return request('/api/role/addUserRole', {
     method: 'POST',
     data: {
       ...params,

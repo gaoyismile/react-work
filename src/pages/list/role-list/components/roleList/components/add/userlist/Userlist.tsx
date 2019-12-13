@@ -8,8 +8,6 @@ import { connect } from 'dva';
 import { StateType } from './model';
 import StandardTable, { StandardTableColumnProps } from '../StandardTable';
 import { TableListItem, TableListPagination, TableListParams } from './userlistData';
-import { RouteContext } from '@ant-design/pro-layout';
-import FooterToolbar from '../../../../../../../account/settings/components/FooterToolbar';
 import styles from '../style.less';
 
 const FormItem = Form.Item;
@@ -232,7 +230,7 @@ class TableList extends Component<TableListProps, TableListState> {
     var recordArray: any[] | never[]=[];
     recordArray.push(record.userName,record.userid,record.nickName,record.deptId,record.deptName);
     return {
-      onClick: () => {
+      onDoubleClick: () => {
         this.props.setValue(recordArray);
       },
     };
@@ -266,31 +264,10 @@ class TableList extends Component<TableListProps, TableListState> {
     this.props.handleCancel();//关闭当前弹窗
   }
 
-  validate = () => {
-    const {
-      dispatch,
-    } = this.props;
-    const {submitForm} = this.props.form;
-    console.log("提交的数组:",submitForm);
-    const values = this.props.resultArray;
-    console.log("提交的数组:",values);
-    // submit the values
-    const later = dispatch({
-      type: 'listAndRoleUserList/submitArray',
-      payload: values,
-    });
-    later.then(()=>{
-      this.props.handleCancel();//关闭当前弹窗
-      this.props.refreshNode();//局部刷新页面
-    },1000)
-    
-  };
-
   render() {
     const {
       listAndRoleUserList: { data },
       loading,
-      submitting,
     } = this.props;
     const { selectedRows } = this.state;
     return (
@@ -298,7 +275,6 @@ class TableList extends Component<TableListProps, TableListState> {
         <div className={styles.tableList}>
           <div className={styles.tableListForm}>{this.renderForm()}</div>
           <StandardTable
-            rowKey={record => record.userid}
             selectedRows={selectedRows}
             loading={loading}
             data={data}
@@ -309,18 +285,6 @@ class TableList extends Component<TableListProps, TableListState> {
             scroll={{ y: 180 }}
           />
         </div>
-        <RouteContext.Consumer>
-          {() => (
-            <FooterToolbar>
-              <Button type="primary" onClick={this.validate} loading={submitting}>
-                提交
-              </Button>
-              <Button type="primary" onClick={this.backClick}>
-                返回
-              </Button>
-            </FooterToolbar>
-          )}
-        </RouteContext.Consumer>
       </>
     );
   }

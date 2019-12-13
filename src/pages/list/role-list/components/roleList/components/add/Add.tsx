@@ -159,7 +159,7 @@ class TreeComponent extends Component<TableListProps,TableListState> {
     this.setState({
       resultArray: newArray,
     });
-  }
+  } 
   handleCancel = () => {//点击取消时,清空数组
     this.setState({
       resultArray:[]
@@ -179,6 +179,7 @@ class TreeComponent extends Component<TableListProps,TableListState> {
     values.forEach((element: any[]) => {
         submitArray.push(element[1]);
     });
+
     validateFieldsAndScroll((error: any, formValues: any) => {
       if (!error) {
          // submit the values
@@ -262,8 +263,8 @@ class TreeComponent extends Component<TableListProps,TableListState> {
                   {this.state.resultArray.map(
                     function(strs: React.ReactNode[], index: any) {
                         return (
-                            <Col span={12}>
-                              <div key={index} className={styles.removeDiv} onClick={this.removeArray.bind(this, index)}>{strs[2]}</div>
+                            <Col span={12} key={index}>
+                              <div className={styles.removeDiv} onClick={this.removeArray.bind(this, index)}>{strs[2]}</div>
                             </Col>    
                         );          
                     }.bind(this),

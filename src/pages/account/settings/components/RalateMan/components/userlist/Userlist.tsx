@@ -237,7 +237,7 @@ class TableList extends Component<TableListProps, TableListState> {
     var recordArray: any[] | never[]=[];
     recordArray.push(record.userName,record.userid,record.nickName,record.deptId,record.deptName);
     return {
-      onClick: () => {
+      onDoubleClick: () => {
         this.props.setValue(recordArray);
       },
     };

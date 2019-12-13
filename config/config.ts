@@ -224,6 +224,13 @@ export default {
               hideInMenu: true,
             },
             {
+              name: 'role-user-add-list',
+              icon: 'smile',
+              path: '/list/user-list/components/roleList/components/add/roleAdd',
+              component: './list/user-list/components/roleList/components/add/roleAdd',
+              hideInMenu: true,
+            },
+            {
               name: '基础详情页',
               icon: 'smile',
               path: '/profilebasic',
