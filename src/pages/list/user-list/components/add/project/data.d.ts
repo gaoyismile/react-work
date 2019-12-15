@@ -1,9 +1,7 @@
 export interface TableListItem {
   key: number;
-  userid: number;
-  userName: string;
-  nickName: string;
-  deptName: string;
+  projectid: number;
+  projectName: string;
 }
 
 export interface TableListPagination {

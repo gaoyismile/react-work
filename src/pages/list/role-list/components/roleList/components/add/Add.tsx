@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Row,Modal,Collapse,Form,Input,Select,Button,Icon,Popover } from 'antd';
-import Tree from './tree/Tree';
+import { Col, Row, Modal, Collapse, Form, Input, Select, Button, Icon, Popover } from 'antd';
 import styles from './style.less';
 import { GridContent } from '@ant-design/pro-layout';
 import { Dispatch, Action } from 'redux';
@@ -36,7 +35,7 @@ interface TableListProps extends FormComponentProps {
   deptId: string;
   setValue: [];
   submitting: boolean;
-  resultArray:[];
+  resultArray: [];
 }
 
 interface TableListState {
@@ -45,7 +44,7 @@ interface TableListState {
   updateModalVisible: boolean;
   expandForm: boolean;
   formValues: { [key: string]: string };
-  resultArray:[];
+  resultArray: [];
 }
 
 @connect(
@@ -66,10 +65,9 @@ interface TableListState {
     listAndRoleUserList,
     loading: loading.models.listAndRoleUserList,
     submitting: loading.effects['listAndRoleUserList/submitArray'],
-
   }),
 )
-class TreeComponent extends Component<TableListProps,TableListState> {
+class TreeComponent extends Component<TableListProps, TableListState> {
   constructor(props: Readonly<{}>) {
     super(props);
     this.state = {
@@ -116,7 +114,7 @@ class TreeComponent extends Component<TableListProps,TableListState> {
           content={errorList}
           overlayClassName={styles.errorPopover}
           trigger="click"
-          getPopupContainer={(trigger) => {
+          getPopupContainer={trigger => {
             if (trigger && trigger.parentNode) {
               return trigger.parentNode;
             }
@@ -129,11 +127,9 @@ class TreeComponent extends Component<TableListProps,TableListState> {
       </span>
     );
   };
-  componentDidMount() {
-      
-  }
+  componentDidMount() {}
 
-  onNodeClick = (e: any, node: { id: any; }) => {
+  onNodeClick = (e: any, node: { id: any }) => {
     this.setState({ deptId: node.id });
   };
 
@@ -159,12 +155,13 @@ class TreeComponent extends Component<TableListProps,TableListState> {
     this.setState({
       resultArray: newArray,
     });
-  } 
-  handleCancel = () => {//点击取消时,清空数组
+  }
+  handleCancel = () => {
+    //点击取消时,清空数组
     this.setState({
-      resultArray:[]
-    })
-    this.props.form.resetFields();//重置表单信息
+      resultArray: [],
+    });
+    this.props.form.resetFields(); //重置表单信息
     let status = false;
     this.props.status(status);
   };
@@ -177,142 +174,143 @@ class TreeComponent extends Component<TableListProps,TableListState> {
     const values = this.state.resultArray;
     var submitArray: any[] | never[] = [];
     values.forEach((element: any[]) => {
-        submitArray.push(element[1]);
+      submitArray.push(element[1]);
     });
 
     validateFieldsAndScroll((error: any, formValues: any) => {
       if (!error) {
-         // submit the values
+        // submit the values
         const later = dispatch({
           type: 'listAndRoleUserList/submitArray',
           payload: {
-            formValue:formValues,
-            tableValue:submitArray,
-            projectid:this.props.projectid,
+            formValue: formValues,
+            tableValue: submitArray,
+            projectid: this.props.projectid,
           },
         });
-        later.then(()=>{
-          this.handleCancel();//关闭当前弹窗
-          this.props.refreshNode();//局部刷新页面
-        },1000)
+        later.then(() => {
+          this.handleCancel(); //关闭当前弹窗
+          this.props.refreshNode(); //局部刷新页面
+        }, 1000);
       }
     });
-   
-    
   };
 
   render() {
-    const { 
-      visible, 
+    const {
+      visible,
       form: { getFieldDecorator },
       submitting,
     } = this.props;
     const formItemLayout = {
       labelCol: {
-          span: 6
+        span: 6,
       },
       wrapperCol: {
-        span: 18
+        span: 18,
       },
     };
     return (
-       <Modal 
-                width="100%"  
-                visible={visible}
-                title="添加"
-                onCancel={this.handleCancel}
-                style={{ top:0 }}
-                footer={
-                  [] 
-                }
-              >
-      <GridContent>
-        <Row gutter={24}>
-          <Col lg={12} md={24}>
-            <Collapse defaultActiveKey={['1']}>
-              <Panel header="角色信息" key="1">
-              <Form layout="horizontal" hideRequiredMark>
-                <Col span={12}>
-                  <Form.Item label="角色描述" {...formItemLayout}>
-                    {getFieldDecorator('roleDesc', {
-                      rules: [{ required: true, message: '请输入角色描述' }],
-                    })(<Input placeholder="请输入角色描述" />)}
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item label="角色类别" {...formItemLayout}>
-                    {getFieldDecorator('roleCategory', {
-                      rules: [{ required: true, message: '请选择角色类别' }],
-                      })(
-                        <Select placeholder="请选择角色类别">
-                          <Option value="菜单角色">菜单角色</Option>
-                          <Option value="数据角色">数据角色</Option>
-                          <Option value="流程角色">流程角色</Option>
-                        </Select>,
-                    )}
-                  </Form.Item>
-                </Col>
-                </Form>
-              </Panel>
-            </Collapse>
-          </Col>
-          <Col lg={6} md={24}>
-            <Collapse defaultActiveKey={['1']}>
-              <Panel header="已选择[双击移除]" key="1">
-                <Row gutter={[24, 12]}>
-                  {this.state.resultArray.map(
-                    function(strs: React.ReactNode[], index: any) {
+      <Modal
+        width="100%"
+        visible={visible}
+        title="添加"
+        onCancel={this.handleCancel}
+        style={{ top: 0 }}
+        footer={[]}
+      >
+        <GridContent>
+          <Row gutter={24}>
+            <Col lg={12} md={24}>
+              <Collapse defaultActiveKey={['1']}>
+                <Panel header="角色信息" key="1">
+                  <Form layout="horizontal" hideRequiredMark>
+                    <Col span={12}>
+                      <Form.Item label="角色描述" {...formItemLayout}>
+                        {getFieldDecorator('roleDesc', {
+                          rules: [{ required: true, message: '请输入角色描述' }],
+                        })(<Input placeholder="请输入角色描述" />)}
+                      </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                      <Form.Item label="角色类别" {...formItemLayout}>
+                        {getFieldDecorator('roleCategory', {
+                          rules: [{ required: true, message: '请选择角色类别' }],
+                        })(
+                          <Select placeholder="请选择角色类别">
+                            <Option value="菜单角色">菜单角色</Option>
+                            <Option value="数据角色">数据角色</Option>
+                            <Option value="流程角色">流程角色</Option>
+                          </Select>,
+                        )}
+                      </Form.Item>
+                    </Col>
+                  </Form>
+                </Panel>
+              </Collapse>
+            </Col>
+            <Col lg={6} md={24}>
+              <Collapse defaultActiveKey={['1']}>
+                <Panel header="已选择[双击移除]" key="1">
+                  <Row gutter={[24, 12]}>
+                    {this.state.resultArray.map(
+                      function(strs: React.ReactNode[], index: any) {
                         return (
-                            <Col span={12} key={index}>
-                              <div className={styles.removeDiv} onClick={this.removeArray.bind(this, index)}>{strs[2]}</div>
-                            </Col>    
-                        );          
-                    }.bind(this),
-                  )}
-                </Row>
-              </Panel>
-            </Collapse>
-          </Col>
-          <Col lg={6} md={24}>
-            <Collapse defaultActiveKey={['1']}>
-              <Panel header="资源权限" key="1">
+                          <Col span={12} key={index}>
+                            <div
+                              className={styles.removeDiv}
+                              onClick={this.removeArray.bind(this, index)}
+                            >
+                              {strs[2]}
+                            </div>
+                          </Col>
+                        );
+                      }.bind(this),
+                    )}
+                  </Row>
+                </Panel>
+              </Collapse>
+            </Col>
+            <Col lg={6} md={24}>
+              <Collapse defaultActiveKey={['1']}>
+                <Panel header="资源权限" key="1">
                   {/* 厚度似乎丢失覅u给打死u给覅u吊死扶伤回复丢失覅u的说法是
                   哦时间都放假死哦夫i的sys地方胜多负少范德萨发生的范德萨发达但是
                   是u搞丢是个覅u是覅u第四u覅u第三个导入日渐扩大飞机贷款首付多少 */}
-              </Panel>
-            </Collapse>
-          </Col>
-        </Row>
-        <Row gutter={24}>
-          <Col lg={12} md={24}>
+                </Panel>
+              </Collapse>
+            </Col>
+          </Row>
+          <Row gutter={24}>
+            <Col lg={12} md={24}>
               <Collapse defaultActiveKey={['1']}>
                 <Panel header="用户信息[双击选择]" key="1">
                   <Userlist
-                      deptId={this.state.deptId}
-                      setValue={this.setValue.bind(this)}
-                      resultArray={this.state.resultArray}
-                      handleCancel={() => this.handleCancel()}
-                      refreshNode={this.props.refreshNode}
-                  /> 
-              </Panel>
-            </Collapse>
-          </Col>
-        </Row>
-        <RouteContext.Consumer>
-          {() => (
-            <FooterToolbar>
-              {this.getErrorInfo()}
-              <Button type="primary" onClick={this.validate} loading={submitting}>
-                提交
-              </Button>
-              <Button type="primary" onClick={this.handleCancel}>
-                返回
-              </Button>
-            </FooterToolbar>
-          )}
-        </RouteContext.Consumer>
-      </GridContent>
-      </Modal> 
+                    deptId={this.state.deptId}
+                    setValue={this.setValue.bind(this)}
+                    resultArray={this.state.resultArray}
+                    handleCancel={() => this.handleCancel()}
+                    refreshNode={this.props.refreshNode}
+                  />
+                </Panel>
+              </Collapse>
+            </Col>
+          </Row>
+          <RouteContext.Consumer>
+            {() => (
+              <FooterToolbar>
+                {this.getErrorInfo()}
+                <Button type="primary" onClick={this.validate} loading={submitting}>
+                  提交
+                </Button>
+                <Button type="primary" onClick={this.handleCancel}>
+                  返回
+                </Button>
+              </FooterToolbar>
+            )}
+          </RouteContext.Consumer>
+        </GridContent>
+      </Modal>
     );
   }
 }

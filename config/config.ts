@@ -238,6 +238,13 @@ export default {
               hideInMenu: true,
             },
             {
+              name: 'user-add-list',
+              icon: 'smile',
+              path: '/list/user-list/components/add/userlist/Userlist',
+              component: './list/user-list/components/add/userlist/Userlist',
+              hideInMenu: true,
+            },
+            {
               name: '基础详情页',
               icon: 'smile',
               path: '/profilebasic',
@@ -277,7 +284,7 @@ export default {
         resourcePath: string;
       },
       _: string,
-      localName: string
+      localName: string,
     ) => {
       if (
         context.resourcePath.includes('node_modules') ||

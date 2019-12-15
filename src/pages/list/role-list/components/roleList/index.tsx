@@ -1,12 +1,4 @@
-import {
-  Button,
-  Card,
-  Col,
-  Form,
-  Input,
-  Row,
-  message,
-} from 'antd';
+import { Button, Card, Col, Form, Input, Row } from 'antd';
 import React, { Component, Fragment } from 'react';
 
 import { Dispatch, Action } from 'redux';
@@ -14,8 +6,7 @@ import { FormComponentProps } from 'antd/es/form';
 import { SorterResult } from 'antd/es/table';
 import { connect } from 'dva';
 import { StateType } from './model';
-import StandardTable, { StandardTableColumnProps } from './components/StandardTable';
-import UpdateForm, { FormValueType } from './components/UpdateForm';
+import StandardTable, { StandardTableColumnProps } from './components/add/StandardTable';
 import { TableListItem, TableListPagination, TableListParams } from './data';
 import styles from './style.less';
 import Add from './components/add/Add';
@@ -37,8 +28,8 @@ interface TableListProps extends FormComponentProps {
   >;
   loading: boolean;
   listAndRoleList: StateType;
-  projectid:number;
-  roleid:number;
+  projectid: number;
+  roleid: number;
 }
 
 interface TableListState {
@@ -49,8 +40,8 @@ interface TableListState {
   visible: boolean;
   formValues: { [key: string]: string };
   stepFormValues: Partial<TableListItem>;
-  projectid:number;
-  roleid:number;
+  projectid: number;
+  roleid: number;
 }
 
 /* eslint react/no-multi-comp:0 */
@@ -78,9 +69,9 @@ class TableList extends Component<TableListProps, TableListState> {
     selectedRows: [],
     formValues: {},
     stepFormValues: {},
-    visible:false,
-    projectid:0,
-    roleid:0,
+    visible: false,
+    projectid: 0,
+    roleid: 0,
   };
 
   columns: StandardTableColumnProps[] = [
@@ -93,37 +84,37 @@ class TableList extends Component<TableListProps, TableListState> {
           <Button icon="delete" onClick={this.handleMenuClick} />
         </Fragment>
       ),
-      width:100,
+      width: 100,
     },
     {
       title: '角色描述',
       dataIndex: 'roleDesc',
       sorter: true,
-      width:130,
+      width: 130,
     },
     {
       title: '项目名称',
       dataIndex: 'projectName',
       sorter: true,
-      width:200,
+      width: 200,
     },
     {
       title: '角色类别',
       dataIndex: 'roleCategory',
       sorter: true,
-      width:200,
+      width: 200,
     },
   ];
 
-  getRoles= (projectid: number) =>{
-    const { dispatch} = this.props;
+  getRoles = (projectid: number) => {
+    const { dispatch } = this.props;
     dispatch({
       type: 'listAndRoleList/fetch',
       payload: {
         projectid: projectid,
       },
     });
-  }
+  };
 
   componentDidMount() {
     const { dispatch } = this.props;
@@ -182,18 +173,18 @@ class TableList extends Component<TableListProps, TableListState> {
       expandForm: !expandForm,
     });
   };
- 
+
   handleMenuClick = () => {
     const { dispatch } = this.props;
     const { selectedRows } = this.state;
-    if (!selectedRows){
+    if (!selectedRows) {
       return;
     }
-    if (selectedRows==null || selectedRows.length<1){
-      alert("请至少选择一项");
+    if (selectedRows == null || selectedRows.length < 1) {
+      alert('请至少选择一项');
       return;
     }
-    const later =dispatch({
+    const later = dispatch({
       type: 'listAndRoleList/remove',
       payload: {
         key: selectedRows.map(row => row.roleid),
@@ -204,9 +195,10 @@ class TableList extends Component<TableListProps, TableListState> {
         });
       },
     });
-    later.then(()=>{// 删除之后页面要刷新，还得重新获取数据
+    later.then(() => {
+      // 删除之后页面要刷新，还得重新获取数据
       this.componentDidMount();
-    })
+    });
   };
 
   handleSelectRows = (rows: TableListItem[]) => {
@@ -224,9 +216,9 @@ class TableList extends Component<TableListProps, TableListState> {
       if (err) return;
 
       const values = {
-        ...fieldsValue, 
+        ...fieldsValue,
         updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
-        projectid: this.props.projectid
+        projectid: this.props.projectid,
       };
 
       this.setState({
@@ -240,61 +232,12 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
-  handleModalVisible = (projectid:any,flag?: boolean) => {
+  handleModalVisible = (projectid: any, flag?: boolean) => {
     this.setState({
       visible: !!flag,
-      projectid:projectid,
+      projectid: projectid,
     });
   };
-
-  handleUpdateModalVisible = (flag?: boolean, record?: FormValueType) => {
-    this.setState({
-      updateModalVisible: !!flag,
-      stepFormValues: record || {},
-    });
-  };
-
-  // handleAdd = (fields: { userName: any,password: any,nickName: any,sex: any,age: any }) => {
-  //   const { dispatch } = this.props;
-  //   const later = dispatch({
-  //     type: 'listAndRoleList/add',
-  //     payload: {
-  //       userName: fields.userName,
-  //       password: fields.password,
-  //       nickName: fields.nickName,
-  //       sex: fields.sex,
-  //       age: fields.age,
-  //     },
-  //   });
-  //   message.success('添加成功');
-  //   this.handleModalVisible();//关闭弹窗
-  //   later.then(()=>{//刷新列表
-  //     this.componentDidMount();
-  //   })
-  // };
-
-  // handleUpdate = (fields: FormValueType) => {
-  //   const { dispatch } = this.props;
-  //   const later = dispatch({
-  //     type: 'listAndRoleList/update',
-  //     payload: {
-  //       projectid: fields.projectid,
-  //       userName: fields.userName,
-  //       nickName: fields.nickName,
-  //       key: fields.key,
-  //       password: fields.password,
-  //       sex: fields.sex,
-  //       age: fields.age,
-  //       userStatus: fields.userStatus,
-  //     },
-  //   });
-
-  //   message.success('修改成功');
-  //   this.handleUpdateModalVisible();
-  //   later.then(()=>{//刷新列表
-  //     this.componentDidMount();
-  //   })
-  // };
 
   renderSimpleForm() {
     const { form } = this.props;
@@ -309,10 +252,13 @@ class TableList extends Component<TableListProps, TableListState> {
           </Col>
           <Col md={8} sm={24}>
             <span className={styles.submitButtons}>
-              <Button type="primary" icon="search" htmlType="submit"/>
+              <Button type="primary" icon="search" htmlType="submit" />
               &nbsp;&nbsp;&nbsp;
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(this.props.projectid,true)}>
-              </Button>
+              <Button
+                icon="plus"
+                type="primary"
+                onClick={() => this.handleModalVisible(this.props.projectid, true)}
+              ></Button>
             </span>
           </Col>
         </Row>
@@ -324,47 +270,47 @@ class TableList extends Component<TableListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  changeStatus = (status: any) =>{
+  changeStatus = (status: any) => {
     this.setState({
-      visible:status
-    })
-  }
+      visible: status,
+    });
+  };
 
-  refreshNode = () =>{
+  refreshNode = () => {
     this.componentDidMount();
-  }
+  };
 
   render() {
     const {
       listAndRoleList: { data },
       loading,
     } = this.props;
-    const { selectedRows, visible, updateModalVisible, stepFormValues } = this.state;
+    const { selectedRows, visible } = this.state;
     // const updateMethods = {
     //   handleUpdateModalVisible: this.handleUpdateModalVisible,
     //   handleUpdate: this.handleUpdate,
     // };
     return (
-      <div>       
-        角色信息 
+      <div>
+        角色信息
         <Card bordered={false}>
           <div className={styles.tableList}>
             <div className={styles.tableListForm}>{this.renderForm()}</div>
-                <StandardTable
-                  rowKey={record => record.roleid}
-                  selectedRows={selectedRows}
-                  loading={loading}
-                  data={data}
-                  columns={this.columns}
-                  onSelectRow={this.handleSelectRows}
-                  onChange={this.handleStandardTableChange}
-                  scroll={{ x: 1000 ,y:280}}
-                />
-          </div>  
+            <StandardTable
+              rowKey={record => record.roleid}
+              selectedRows={selectedRows}
+              loading={loading}
+              data={data}
+              columns={this.columns}
+              onSelectRow={this.handleSelectRows}
+              onChange={this.handleStandardTableChange}
+              scroll={{ x: 1000, y: 280 }}
+            />
+          </div>
         </Card>
-        <Add 
+        <Add
           projectid={this.state.projectid}
-          visible={visible} 
+          visible={visible}
           status={this.changeStatus}
           refreshNode={this.refreshNode}
         />
@@ -375,7 +321,7 @@ class TableList extends Component<TableListProps, TableListState> {
             values={stepFormValues}
           />
         ) : null} */}
-    </div>   
+      </div>
     );
   }
 }

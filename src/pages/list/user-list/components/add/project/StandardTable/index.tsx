@@ -1,8 +1,8 @@
-import { Alert, Table } from 'antd';
+import { Table } from 'antd';
 import { ColumnProps, TableRowSelection, TableProps } from 'antd/es/table';
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
-import { TableListItem } from '../../data';
+import { TableListItem } from '../data';
 import styles from './index.less';
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
@@ -100,7 +100,7 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
   };
 
   render() {
-    const { selectedRowKeys, needTotalList } = this.state;
+    const { selectedRowKeys } = this.state;
     const { data, rowKey, ...rest } = this.props;
     const { list = [], pagination = false } = data || {};
     const paginationProps = pagination
@@ -114,9 +114,6 @@ class StandardTable extends Component<StandardTableProps<TableListItem>, Standar
     const rowSelection: TableRowSelection<TableListItem> = {
       selectedRowKeys,
       onChange: this.handleRowSelectChange,
-      getCheckboxProps: (record: TableListItem) => ({
-        userStatus: record.userStatus,
-      }),
     };
 
     return (
