@@ -45,7 +45,7 @@ class UpdateForm extends Component<UpdateFormProps, UpdateFormState> {
     super(props);
 
     this.state = {
-      formVals: {
+      formVals: { 
         userid: props.values.userid,
         userName: props.values.userName,
         nickName: props.values.nickName,

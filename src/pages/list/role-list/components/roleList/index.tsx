@@ -10,6 +10,7 @@ import StandardTable, { StandardTableColumnProps } from './components/add/Standa
 import { TableListItem, TableListPagination, TableListParams } from './data';
 import styles from './style.less';
 import Add from './components/add/Add';
+import Update from './components/update/Update'
 
 const FormItem = Form.Item;
 const getValue = (obj: { [x: string]: string[] }) =>
@@ -42,6 +43,8 @@ interface TableListState {
   stepFormValues: Partial<TableListItem>;
   projectid: number;
   roleid: number;
+  roleDesc:string;
+  roleCategory:string;
 }
 
 /* eslint react/no-multi-comp:0 */
@@ -72,6 +75,8 @@ class TableList extends Component<TableListProps, TableListState> {
     visible: false,
     projectid: 0,
     roleid: 0,
+    roleDesc:'',
+    roleCategory:'',
   };
 
   columns: StandardTableColumnProps[] = [
@@ -80,7 +85,7 @@ class TableList extends Component<TableListProps, TableListState> {
       render: (text, record) => (
         <Fragment>
           <Button icon="search" onClick={this.handleMenuClick} />
-          <Button icon="edit" onClick={this.handleMenuClick} />
+          <Button icon="edit" onClick={() => this.handleUpateModalVisible(this.props.projectid,record.roleid,record.roleDesc,record.roleCategory, true)}/>
           <Button icon="delete" onClick={this.handleMenuClick} />
         </Fragment>
       ),
@@ -117,10 +122,10 @@ class TableList extends Component<TableListProps, TableListState> {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'listAndRoleList/fetch',
-    });
+    // const { dispatch } = this.props;
+    // dispatch({
+    //   type: 'listAndRoleList/fetch',
+    // });
     this.props.onRef(this);
   }
 
@@ -239,6 +244,16 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
+  handleUpateModalVisible = (projectid: any,roleid: any,roleDesc: any,roleCategory: any, flag?: boolean) => {
+    this.setState({
+      updateModalVisible: !!flag,
+      projectid: projectid,
+      roleid: roleid,
+      roleDesc: roleDesc,
+      roleCategory: roleCategory
+    });
+  };
+
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -276,6 +291,12 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
+  changeUpdateStatus = (status: any) => {
+    this.setState({
+      updateModalVisible: status,
+    });
+  };
+
   refreshNode = () => {
     this.componentDidMount();
   };
@@ -285,11 +306,7 @@ class TableList extends Component<TableListProps, TableListState> {
       listAndRoleList: { data },
       loading,
     } = this.props;
-    const { selectedRows, visible } = this.state;
-    // const updateMethods = {
-    //   handleUpdateModalVisible: this.handleUpdateModalVisible,
-    //   handleUpdate: this.handleUpdate,
-    // };
+    const { selectedRows, visible,updateModalVisible } = this.state;
     return (
       <div>
         角色信息
@@ -314,13 +331,15 @@ class TableList extends Component<TableListProps, TableListState> {
           status={this.changeStatus}
           refreshNode={this.refreshNode}
         />
-        {/* {stepFormValues && Object.keys(stepFormValues).length ? (
-          <UpdateForm
-            {...updateMethods}
-            updateModalVisible={updateModalVisible}
-            values={stepFormValues}
-          />
-        ) : null} */}
+        <Update
+          projectid={this.state.projectid}
+          roleid = {this.state.roleid}
+          roleDesc={this.state.roleDesc}
+          roleCategory={this.state.roleCategory}
+          updateModalVisible={updateModalVisible}
+          status={this.changeUpdateStatus}
+          refreshNode={this.refreshNode}
+        />
       </div>
     );
   }

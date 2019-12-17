@@ -231,6 +231,27 @@ export default {
               hideInMenu: true,
             },
             {
+              name: 'role-user-update-list',
+              icon: 'smile',
+              path: '/list/role-list/components/roleList/components/update/Update',
+              component: './list/role-list/components/roleList/components/update/Update',
+              hideInMenu: true,
+            },
+            {
+              name: 'role-user-update-user-add-list',
+              icon: 'smile',
+              path: '/list/role-list/components/roleList/components/update/userlist/add/userlist/UserAdd',
+              component: './list/role-list/components/roleList/components/update/userlist/add/userlist/UserAdd',
+              hideInMenu: true,
+            },
+            {
+              name: 'role-user-update-user-list',
+              icon: 'smile',
+              path: '/list/role-list/components/roleList/components/update/userlist/Userlist',
+              component: './list/role-list/components/roleList/components/update/userlist/Userlist',
+              hideInMenu: true,
+            },
+            {
               name: 'user-dept-add-list',
               icon: 'smile',
               path: '/list/user-list/components/dept/dept',
@@ -238,10 +259,17 @@ export default {
               hideInMenu: true,
             },
             {
-              name: 'user-add-list',
+              name: 'user-add-user-list',
               icon: 'smile',
               path: '/list/user-list/components/add/userlist/Userlist',
               component: './list/user-list/components/add/userlist/Userlist',
+              hideInMenu: true,
+            },
+            {
+              name: 'user-add-project-list',
+              icon: 'smile',
+              path: '/list/user-list/components/add/project/project',
+              component: './list/user-list/components/add/project/project',
               hideInMenu: true,
             },
             {

@@ -12,14 +12,14 @@ import styles from './style.less';
 interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<
     Action<
-      | 'listAndUserDeptList/add'
-      | 'listAndUserDeptList/fetch'
-      | 'listAndUserDeptList/remove'
-      | 'listAndUserDeptList/update'
+      | 'listAndUserAddProjectList/add'
+      | 'listAndUserAddProjectList/fetch'
+      | 'listAndUserAddProjectList/remove'
+      | 'listAndUserAddProjectList/update'
     >
   >;
   loading: boolean;
-  listAndUserDeptList: StateType;
+  listAndUserAddProjectList: StateType;
 }
 
 interface TableListState {
@@ -36,18 +36,18 @@ interface TableListState {
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    listAndUserDeptList,
+    listAndUserAddProjectList,
     loading,
   }: {
-    listAndUserDeptList: StateType;
+    listAndUserAddProjectList: StateType;
     loading: {
       models: {
         [key: string]: boolean;
       };
     };
   }) => ({
-    listAndUserDeptList,
-    loading: loading.models.listAndUserDeptList,
+    listAndUserAddProjectList,
+    loading: loading.models.listAndUserAddProjectList,
   }),
 )
 class TableList extends Component<TableListProps, TableListState> {
@@ -73,15 +73,21 @@ class TableList extends Component<TableListProps, TableListState> {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndUserDeptList/fetch',
+      type: 'listAndUserAddProjectList/fetch',
     });
-    //this.props.onProjectRef(this);
+    this.props.onClearRowsRef(this);
+  }
+
+  clearProjectRows =() => {
+    this.setState({
+      selectedRows: [],
+    })
   }
 
   getRestProjects = () => {
     const { dispatch } = this.props;
     dispatch({
-      type: 'listAndUserDeptList/fetch',
+      type: 'listAndUserAddProjectList/fetch',
     });
   };
 
@@ -102,7 +108,7 @@ class TableList extends Component<TableListProps, TableListState> {
 
   render() {
     const {
-      listAndUserDeptList: { data },
+      listAndUserAddProjectList: { data },
       loading,
     } = this.props;
     const { selectedRows } = this.state;

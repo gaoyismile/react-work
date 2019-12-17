@@ -91,6 +91,7 @@ class TreeComponent extends Component<TableListProps, TableListState> {
       resultArray: newArray,
     });
   }
+
   removeArray(index: any) {
     var newArray = this.state.resultArray;
     newArray.splice(index, 1);
@@ -98,12 +99,14 @@ class TreeComponent extends Component<TableListProps, TableListState> {
       resultArray: newArray,
     });
   }
+
   handleCancel = () => {
     //点击取消时,清空数组
     this.setState({
       resultArray: [],
+      selectProjectRow: [],
     });
-    this.props.form.resetFields(); //重置表单信息
+    this.child.clearProjectRows();//清空选中项目
     let status = false;
     this.props.status(status);
   };
@@ -114,33 +117,37 @@ class TreeComponent extends Component<TableListProps, TableListState> {
     });
   }
 
+  onClearRowsRef = (ref: any) => {
+    this.child = ref
+  }
+
   validate = () => {
     const {
       dispatch,
-      form: { validateFieldsAndScroll },
     } = this.props;
+    const selectRow = this.state.selectProjectRow
+    console.log("选中的selectRow:",selectRow);
+    if(selectRow.length<=0){
+      alert("必须选择项目");
+      return false;
+    }
     const values = this.state.resultArray;
     var submitArray: any[] | never[] = [];
     values.forEach((element: any[]) => {
       submitArray.push(element[1]);
     });
-
-    validateFieldsAndScroll((error: any, formValues: any) => {
-      if (!error) {
-        // submit the values
-        const later = dispatch({
-          type: 'listAndUserAddList/submitArray',
-          payload: {
-            projects: this.state.selectProjectRow,
-            users: submitArray,
-          },
-        });
-        later.then(() => {
-          this.handleCancel(); //关闭当前弹窗
-          this.props.refreshUser(); //局部刷新页面
-        }, 1000);
-      }
+    // submit the values
+    const later = dispatch({
+      type: 'listAndUserAddList/submitArray',
+      payload: {
+        projects: selectRow,
+        users: submitArray,
+      },
     });
+    later.then(() => {
+      this.handleCancel(); //关闭当前弹窗
+      this.props.refreshUser(); //局部刷新页面
+    }, 1000);
   };
 
   render() {
@@ -157,7 +164,10 @@ class TreeComponent extends Component<TableListProps, TableListState> {
         <GridContent>
           <Row gutter={24}>
             <Col lg={5} md={24}>
-              <Project selectProjectRow={this.getSelectProject.bind(this)} />
+              <Project 
+                selectProjectRow={this.getSelectProject.bind(this)} 
+                onClearRowsRef={this.onClearRowsRef}
+              />
             </Col>
             <Col lg={19} md={24}>
               <Userlist

@@ -3,8 +3,10 @@ export interface TableListItem {
   userid: number;
   userName: string;
   nickName: string;
+  deptId: number;
   deptName: string;
-  projectName:string;
+  deptRank: string;
+  createdAt: Date;
 }
 
 export interface TableListPagination {
@@ -20,7 +22,7 @@ export interface TableListData {
 
 export interface TableListParams {
   sorter: string;
-  userStatus: string;
+  status: string;
   userName: string;
   pageSize: number;
   currentPage: number;

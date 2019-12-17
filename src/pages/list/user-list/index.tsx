@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, Row, message } from 'antd';
+import { Button, Card, Col, Form, Input, Row } from 'antd';
 import React, { Component, Fragment } from 'react';
 
 import { Dispatch, Action } from 'redux';
@@ -92,6 +92,11 @@ class TableList extends Component<TableListProps, TableListState> {
     {
       title: '用户姓名',
       dataIndex: 'nickName',
+      width: 200,
+    },
+    {
+      title: '所属项目',
+      dataIndex: 'projectName',
       width: 200,
     },
     {
@@ -239,50 +244,6 @@ class TableList extends Component<TableListProps, TableListState> {
     this.setState({
       updateModalVisible: !!flag,
       stepFormValues: record || {},
-    });
-  };
-
-  handleAdd = (fields: { userName: any; password: any; nickName: any; sex: any; age: any }) => {
-    const { dispatch } = this.props;
-    const later = dispatch({
-      type: 'listAndUserList/add',
-      payload: {
-        userName: fields.userName,
-        password: fields.password,
-        nickName: fields.nickName,
-        sex: fields.sex,
-        age: fields.age,
-      },
-    });
-    message.success('添加成功');
-    this.handleModalVisible(); //关闭弹窗
-    later.then(() => {
-      //刷新列表
-      this.componentDidMount();
-    });
-  };
-
-  handleUpdate = (fields: FormValueType) => {
-    const { dispatch } = this.props;
-    const later = dispatch({
-      type: 'listAndUserList/update',
-      payload: {
-        userid: fields.userid,
-        userName: fields.userName,
-        nickName: fields.nickName,
-        key: fields.key,
-        password: fields.password,
-        sex: fields.sex,
-        age: fields.age,
-        userStatus: fields.userStatus,
-      },
-    });
-
-    message.success('修改成功');
-    this.handleUpdateModalVisible();
-    later.then(() => {
-      //刷新列表
-      this.componentDidMount();
     });
   };
 
