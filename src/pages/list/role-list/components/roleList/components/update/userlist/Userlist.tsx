@@ -32,6 +32,7 @@ interface TableListProps extends FormComponentProps {
   submitting: boolean;
   resultArray:[];
   roleid:number;
+  handleCancel():{};
 }
 
 interface TableListState {
@@ -120,7 +121,7 @@ class TableList extends Component<TableListProps, TableListState> {
   shouldComponentUpdate(nextProps: { roleid: any; }, nextState: any) {
     const { roleid } = nextProps
     if (this.props.roleid !== roleid) {
-      this.getUserList(roleid)
+      this.getUserList(roleid);
     }
     return true
   }

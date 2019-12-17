@@ -1,15 +1,14 @@
-import { Button, Col, Form, Input, Row,Modal,message } from 'antd';
-import React, { Component } from 'react';
+import { Button, Col, Form, Input, Row } from 'antd';
+import React, { Component,Fragment } from 'react';
 
 import { Dispatch, Action } from 'redux';
 import { FormComponentProps } from 'antd/es/form';
 import { SorterResult } from 'antd/es/table';
 import { connect } from 'dva';
 import { StateType } from './model';
-import StandardTable, { StandardTableColumnProps } from './StandardTable';
+import StandardTable, { StandardTableColumnProps } from '../StandardTable';
 import { TableListItem, TableListPagination, TableListParams } from './userlistData';
 import styles from '../style.less';
-
 const FormItem = Form.Item;
 const getValue = (obj: { [x: string]: string[] }) =>
   Object.keys(obj)
@@ -19,19 +18,20 @@ const getValue = (obj: { [x: string]: string[] }) =>
 interface TableListProps extends FormComponentProps {
   dispatch: Dispatch<
     Action<
-      | 'listAndRoleAddUserList/add'
-      | 'listAndRoleAddUserList/fetch'
-      | 'listAndRoleAddUserList/remove'
-      | 'listAndRoleAddUserList/update'
-      | 'listAndRoleAddUserList/submitArray'
+      | 'listAndRoleUserUpdateList/add'
+      | 'listAndRoleUserUpdateList/fetch'
+      | 'listAndRoleUserUpdateList/remove'
+      | 'listAndRoleUserUpdateList/update'
+      | 'listAndRoleUserUpdateList/submitArray'
     >
   >;
   loading: boolean;
-  listAndRoleAddUserList: StateType;
+  listAndRoleUserUpdateList: StateType;
   setValue: [];
   submitting: boolean;
-  resultArray: [];
+  resultArray:[];
   roleid:number;
+  handleCancel():{};
 }
 
 interface TableListState {
@@ -42,15 +42,17 @@ interface TableListState {
   selectedRows: TableListItem[];
   formValues: { [key: string]: string };
   stepFormValues: Partial<TableListItem>;
+  addModalVisible: boolean;
+  roleid:number;
 }
 
 /* eslint react/no-multi-comp:0 */
 @connect(
   ({
-    listAndRoleAddUserList,
+    listAndRoleUserUpdateList,
     loading,
   }: {
-    listAndRoleAddUserList: StateType;
+    listAndRoleUserUpdateList: StateType;
     loading: {
       models: {
         [key: string]: boolean;
@@ -60,9 +62,10 @@ interface TableListState {
       };
     };
   }) => ({
-    listAndRoleAddUserList,
-    loading: loading.models.listAndRoleAddUserList,
-    submitting: loading.effects['listAndRoleAddUserList/add'],
+    listAndRoleUserUpdateList,
+    loading: loading.models.listAndRoleUserUpdateList,
+    submitting: loading.effects['listAndRoleUserUpdateList/submitArray'],
+
   }),
 )
 class TableList extends Component<TableListProps, TableListState> {
@@ -74,41 +77,68 @@ class TableList extends Component<TableListProps, TableListState> {
     selectedRows: [],
     formValues: {},
     stepFormValues: {},
+    addModalVisible:false,
+    roleid:this.props.roleid,
   };
 
   columns: StandardTableColumnProps[] = [
     {
+      title: '操作',
+      render: (text, record) => (
+        <Fragment>
+          <Button icon="delete" onClick={this.handleMenuClick} />
+        </Fragment>
+      ),
+      width: 100,
+    },
+    {
       title: '工号',
       dataIndex: 'userName',
-      width: 100,
+      width:100,
     },
     {
       title: '姓名',
       dataIndex: 'nickName',
-      width: 200,
+      width:200,
     },
     {
       title: '部门名称',
       dataIndex: 'deptName',
-      width: 200,
+      width:200,
     },
     {
       title: '部门层级',
       dataIndex: 'deptRank',
-      width: 200,
+      width:200,
     },
   ];
 
   componentDidMount() {
-    const { dispatch,roleid } = this.props;
+    this.getUserList(this.props.roleid);
+  }
+
+  shouldComponentUpdate(nextProps: { roleid: any; }, nextState: any) {
+    const { roleid } = nextProps
+    if (this.props.roleid !== roleid) {
+      this.getUserList(roleid);
+    }
+    return true
+  }
+
+  getUserList = (roleid:any) =>{
+    const { dispatch} = this.props;
     const params = {
       roleid:roleid,
     }
     dispatch({
-      type: 'listAndRoleAddUserList/fetch',
-      payload:params,
+      type: 'listAndRoleUserUpdateList/fetch',
+      payload: params,
     });
-  }
+  };
+
+  refreshNode = () => {
+    this.componentDidMount();
+  };
 
   handleStandardTableChange = (
     pagination: Partial<TableListPagination>,
@@ -127,6 +157,7 @@ class TableList extends Component<TableListProps, TableListState> {
     const params: Partial<TableListParams> = {
       currentPage: pagination.current,
       pageSize: pagination.pageSize,
+      roleid:this.props.roleid,
       ...formValues,
       ...filters,
     };
@@ -134,7 +165,7 @@ class TableList extends Component<TableListProps, TableListState> {
       params.sorter = `${sorter.field}_${sorter.order}`;
     }
     dispatch({
-      type: 'listAndRoleAddUserList/fetch',
+      type: 'listAndRoleUserUpdateList/fetch',
       payload: params,
     });
   };
@@ -146,7 +177,7 @@ class TableList extends Component<TableListProps, TableListState> {
       formValues: {},
     });
     dispatch({
-      type: 'listAndRoleAddUserList/fetch',
+      type: 'listAndRoleUserUpdateList/fetch',
       payload: {},
     });
   };
@@ -159,7 +190,7 @@ class TableList extends Component<TableListProps, TableListState> {
   };
 
   handleMenuClick = () => {
-    const { dispatch } = this.props;
+    const { dispatch,roleid } = this.props;
     const { selectedRows } = this.state;
     if (!selectedRows) {
       return;
@@ -168,10 +199,11 @@ class TableList extends Component<TableListProps, TableListState> {
       alert('请至少选择一项');
       return;
     }
-    dispatch({
-      type: 'listAndRoleAddUserList/remove',
+    const later = dispatch({
+      type: 'listAndRoleUserUpdateList/remove',
       payload: {
         key: selectedRows.map(row => row.key),
+        roleid:roleid,
       },
       callback: () => {
         this.setState({
@@ -179,10 +211,13 @@ class TableList extends Component<TableListProps, TableListState> {
         });
       },
     });
+    later.then(() => {
+      // 删除之后页面要刷新，还得重新获取数据
+      this.componentDidMount();
+    });
   };
 
   handleSelectRows = (rows: TableListItem[]) => {
-    console.log("选中rows:",rows);
     this.setState({
       selectedRows: rows,
     });
@@ -195,10 +230,11 @@ class TableList extends Component<TableListProps, TableListState> {
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
-
+ 
       const values = {
         ...fieldsValue,
         updatedAt: fieldsValue.updatedAt && fieldsValue.updatedAt.valueOf(),
+        roleid: this.props.roleid,
       };
 
       this.setState({
@@ -206,7 +242,7 @@ class TableList extends Component<TableListProps, TableListState> {
       });
 
       dispatch({
-        type: 'listAndRoleAddUserList/fetch',
+        type: 'listAndRoleUserUpdateList/fetch',
         payload: values,
       });
     });
@@ -218,14 +254,8 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
-  addItem = () => {
-    this.setState({
-      visible: true,
-    });
-  };
   handleCancel = () => {
-    let status = false;
-    this.props.status(status);
+    this.setState({ visible: false });
   };
 
   renderSimpleForm() {
@@ -238,9 +268,7 @@ class TableList extends Component<TableListProps, TableListState> {
             <FormItem label="快速查询">
               {getFieldDecorator('userName')(<Input placeholder="工号/用户姓名" />)}
             </FormItem>
-            <span>
-              <Button icon="search" type="primary" htmlType="submit"></Button>
-            </span>
+            <Button icon="search" type="primary" htmlType="submit"></Button>
           </Col>
         </Row>
       </Form>
@@ -251,45 +279,20 @@ class TableList extends Component<TableListProps, TableListState> {
     return this.renderSimpleForm();
   }
 
-  backClick = () => {
-    this.props.handleCancel(); //关闭当前弹窗
-  };
-
-  okHandle = () => {
-    const { dispatch } = this.props;
-    const { selectedRows } = this.state;
-    const later = dispatch({
-      type: 'listAndRoleAddUserList/add',
-      payload: {
-        key: selectedRows.map(row => row.userid),
-        roleid:this.props.roleid,
-      },
-    });
-    message.success('添加成功');
-    this.handleCancel();//关闭弹窗
-    later.then(()=>{//刷新列表
-      this.componentDidMount();
-      this.props.refreshNode(); //局部刷新页面
-    })
-  };
+  backClick= () => {
+    this.props.handleCancel();//关闭当前弹窗
+  }
 
   render() {
     const {
-      listAndRoleAddUserList: { data },
+      listAndRoleUserUpdateList: { data },
       loading,
-      addModalVisible,
     } = this.props;
     const { selectedRows } = this.state;
-    return ( 
-      <Modal
-        destroyOnClose
-        title="添加分配用户"
-        style={{ top: 20 }}
-        visible={addModalVisible}
-        onOk={this.okHandle}
-        onCancel={this.handleCancel}
-      >
+    return (
+      <>
         <div className={styles.tableList}>
+          
           <div className={styles.tableListForm}>{this.renderForm()}</div>
           <StandardTable
             selectedRows={selectedRows}
@@ -298,10 +301,10 @@ class TableList extends Component<TableListProps, TableListState> {
             columns={this.columns}
             onSelectRow={this.handleSelectRows}
             onChange={this.handleStandardTableChange}
-            scroll={{ x: 1000,y: 220 }} 
+            scroll={{ x: 1000,y: 180 }}
           />
         </div>
-      </Modal>
+      </>
     );
   }
 }

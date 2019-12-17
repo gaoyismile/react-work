@@ -211,15 +211,10 @@ class TableList extends Component<TableListProps, TableListState> {
   renderForm() {
     return this.renderSimpleForm();
   }
-
-  onRef = (ref) => {
-    this.child = ref
-}
    // 选中行
    onClickRow = (record: { projectid: any; }) => {
     return {
       onClick: () => {
-        this.child.getRoles(record.projectid);
         this.setState({
           projectid:record.projectid
         })
@@ -258,7 +253,6 @@ class TableList extends Component<TableListProps, TableListState> {
       </Col>
       <Col lg={16} md={24}>
                 <RoleList 
-                  onRef={this.onRef}
                   projectid={this.state.projectid}
                 />
         </Col>

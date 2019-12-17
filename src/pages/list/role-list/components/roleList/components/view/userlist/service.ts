@@ -2,20 +2,20 @@ import request from '@/utils/request';
 import { TableListParams } from './userlistData';
 
 export async function queryRule(params: TableListParams) {
-  return request('/api/user/unDelete/list', {
+  return request('/api/user/getUserListByRole', {
     params,
   });
 }
 
 export async function submitUserArray(params: any) {
-  return request('/api/user/choose', {
+  return request('/api/role/update', {
     method: 'POST',
     data: params,
   });
 }
 
 export async function removeRule(params: TableListParams) {
-  return request('/api/rule/delete', {
+  return request('/api/role/deleteUser', {
     method: 'POST',
     data: {
       ...params,
@@ -25,7 +25,7 @@ export async function removeRule(params: TableListParams) {
 }
 
 export async function addRule(params: TableListParams) {
-  return request('/api/role/addUserRoleByUser', {
+  return request('/api/rule/add', {
     method: 'POST',
     data: {
       ...params,

@@ -30,15 +30,13 @@ interface TableListProps extends FormComponentProps {
   roleDesc:string;
   roleCategory:string;
   roleid:number;
-  updateModalVisible:boolean;
-  refreshNode():{};
-  status(status:any):{};
+  viewModalVisible:boolean;
 }
 
 interface TableListState {
   modalVisible: boolean;
   visible: boolean;
-  updateModalVisible: boolean;
+  viewModalVisible: boolean;
   expandForm: boolean;
   formValues: { [key: string]: string };
 }
@@ -65,54 +63,6 @@ interface TableListState {
 )
 class TreeComponent extends Component<TableListProps, TableListState> {
   
-  getErrorInfo = () => {
-    const {
-      form: { getFieldsError },
-    } = this.props;
-    const errors = getFieldsError();
-    const errorCount = Object.keys(errors).filter(key => errors[key]).length;
-    if (!errors || errorCount === 0) {
-      return null;
-    }
-    const scrollToField = (fieldKey: string) => {
-      const labelNode = document.querySelector(`label[for="${fieldKey}"]`);
-      if (labelNode) {
-        labelNode.scrollIntoView(true);
-      }
-    };
-    const errorList = Object.keys(errors).map(key => {
-      if (!errors[key]) {
-        return null;
-      }
-      const errorMessage = errors[key] || [];
-      return (
-        <li key={key} className={styles.errorListItem} onClick={() => scrollToField(key)}>
-          <Icon type="cross-circle-o" className={styles.errorIcon} />
-          <div className={styles.errorMessage}>{errorMessage[0]}</div>
-          <div className={styles.errorField}></div>
-        </li>
-      );
-    });
-    return (
-      <span className={styles.errorIcon}>
-        <Popover
-          title="表单校验信息"
-          content={errorList}
-          overlayClassName={styles.errorPopover}
-          trigger="click"
-          getPopupContainer={trigger => {
-            if (trigger && trigger.parentNode) {
-              return trigger.parentNode;
-            }
-            return trigger;
-          }}
-        >
-          <Icon type="exclamation-circle" />
-        </Popover>
-        {errorCount}
-      </span>
-    );
-  };
   componentDidMount() {
     //this.props.onUserRef(this);
   }
@@ -123,33 +73,10 @@ class TreeComponent extends Component<TableListProps, TableListState> {
     this.props.status(status);
   };
 
-  validate = () => {
-    const {
-      dispatch,
-      form: { validateFieldsAndScroll },
-    } = this.props;
-    validateFieldsAndScroll((error: any, formValues: any) => {
-      if (!error) {
-        // submit the values
-        const later = dispatch({
-          type: 'listAndRoleUserUpdateList/submitArray',
-          payload: {
-            formValue: formValues,
-          },
-        });
-        later.then(() => {
-          this.handleCancel(); //关闭当前弹窗
-          this.props.refreshNode(); //局部刷新页面
-        }, 1000);
-      }
-    });
-  };
-
   render() {
     const {
-      updateModalVisible,
+      viewModalVisible,
       form: { getFieldDecorator },
-      submitting,
     } = this.props;
     const formItemLayout = {
       labelCol: {
@@ -162,8 +89,8 @@ class TreeComponent extends Component<TableListProps, TableListState> {
     return (
       <Modal
         width="100%"
-        visible={updateModalVisible}
-        title="添加"
+        visible={viewModalVisible}
+        title="查看"
         onCancel={this.handleCancel}
         style={{ top: 0 }}
         footer={[]}
@@ -185,7 +112,7 @@ class TreeComponent extends Component<TableListProps, TableListState> {
                         {getFieldDecorator('roleDesc', {
                           rules: [{ required: true, message: '请输入角色描述' }],
                           initialValue: this.props.roleDesc,
-                        })(<Input placeholder="请输入角色描述" />)}
+                        })(<Input disabled={true} />)}
                       </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -194,7 +121,7 @@ class TreeComponent extends Component<TableListProps, TableListState> {
                           rules: [{ required: true, message: '请选择角色类别' }],
                           initialValue: this.props.roleCategory,
                         })(
-                          <Select placeholder="请选择角色类别">
+                          <Select disabled={true}>
                             <Option value="菜单角色">菜单角色</Option>
                             <Option value="数据角色">数据角色</Option>
                             <Option value="流程角色">流程角色</Option>
@@ -209,9 +136,7 @@ class TreeComponent extends Component<TableListProps, TableListState> {
             <Col lg={6} md={24}>
               <Collapse defaultActiveKey={['1']}>
                 <Panel header="资源权限" key="1">
-                  {/* 厚度似乎丢失覅u给打死u给覅u吊死扶伤回复丢失覅u的说法是
-                  哦时间都放假死哦夫i的sys地方胜多负少范德萨发生的范德萨发达但是
-                  是u搞丢是个覅u是覅u第四u覅u第三个导入日渐扩大飞机贷款首付多少 */}
+                  
                 </Panel>
               </Collapse>
             </Col>
@@ -222,7 +147,6 @@ class TreeComponent extends Component<TableListProps, TableListState> {
                 <Panel header="用户信息" key="1">
                   <Userlist
                     roleid={this.props.roleid}
-                    handleCancel={() => this.handleCancel()}
                     />
                 </Panel>
               </Collapse>
@@ -231,10 +155,6 @@ class TreeComponent extends Component<TableListProps, TableListState> {
           <RouteContext.Consumer>
             {() => (
               <FooterToolbar>
-                {this.getErrorInfo()}
-                <Button type="primary" onClick={this.validate} loading={submitting}>
-                  提交
-                </Button>
                 <Button type="primary" onClick={this.handleCancel}>
                   返回
                 </Button>
