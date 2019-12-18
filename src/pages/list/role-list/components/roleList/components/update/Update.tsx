@@ -163,7 +163,7 @@ class TreeComponent extends Component<TableListProps, TableListState> {
       <Modal
         width="100%"
         visible={updateModalVisible}
-        title="添加"
+        title="编辑"
         onCancel={this.handleCancel}
         style={{ top: 0 }}
         footer={[]}
