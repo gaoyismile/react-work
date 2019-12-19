@@ -22,7 +22,7 @@ class upload extends React.Component {
     });
     if(formData.get('file')==null){
       alert("请上传文件");
-      return false;
+      return;
     }
     // You can use any AJAX library you like
     reqwest({

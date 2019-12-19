@@ -287,7 +287,7 @@ class TableList extends Component<TableListProps, TableListState> {
   excelPort = () => {
     const { projectid } = this.props;
     const { formValues } = this.state;
-    const roleDesc =formValues.roleDesc;
+    const roleDesc = formValues.roleDesc===undefined?'':formValues.roleDesc;
     location.href="/api/role/export?projectid="+projectid+"&roleDesc="+roleDesc+"";
   }
 
