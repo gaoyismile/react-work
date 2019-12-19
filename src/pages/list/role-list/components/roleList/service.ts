@@ -7,6 +7,12 @@ export async function queryRule(params: TableListParams) {
   });
 }
 
+export async function exportRule(params: TableListParams) {
+  return request('/api/role/export', {
+    params,
+  });
+}
+
 export async function removeRule(params: TableListParams) {
   return request('/api/role/delete', {
     method: 'POST',

@@ -12,7 +12,7 @@ import styles from './style.less';
 import Add from './components/add/Add';
 import Update from './components/update/Update';
 import View from './components/view/View';
-
+import Import from './components/import/Import';
 const FormItem = Form.Item;
 const getValue = (obj: { [x: string]: string[] }) =>
   Object.keys(obj)
@@ -26,6 +26,7 @@ interface TableListProps extends FormComponentProps {
       | 'listAndRoleList/fetch'
       | 'listAndRoleList/remove'
       | 'listAndRoleList/update'
+      | 'listAndRoleList/export'
     >
   >; 
   loading: boolean;
@@ -41,6 +42,7 @@ interface TableListState {
   expandForm: boolean;
   selectedRows: TableListItem[];
   visible: boolean;
+  importVisible: boolean;
   formValues: { [key: string]: string };
   stepFormValues: Partial<TableListItem>;
   projectid: number;
@@ -71,6 +73,7 @@ class TableList extends Component<TableListProps, TableListState> {
     modalVisible: false,
     updateModalVisible: false,
     viewModalVisible: false,
+    importVisible: false,
     expandForm: false,
     selectedRows: [],
     formValues: {},
@@ -254,6 +257,13 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
+  importModalVisible = (projectid: any, flag?: boolean) => {
+    this.setState({
+      importVisible: !!flag,
+      projectid: projectid,
+    });
+  };
+
   handleUpdateModalVisible = (projectid: any,roleid: any,roleDesc: any,roleCategory: any, flag?: boolean) => {
     this.setState({
       updateModalVisible: !!flag,
@@ -274,6 +284,13 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
   
+  excelPort = () => {
+    const { projectid } = this.props;
+    const { formValues } = this.state;
+    const roleDesc =formValues.roleDesc;
+    location.href="/api/role/export?projectid="+projectid+"&roleDesc="+roleDesc+"";
+  }
+
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -294,6 +311,10 @@ class TableList extends Component<TableListProps, TableListState> {
                 type="primary"
                 onClick={() => this.handleModalVisible(this.props.projectid, true)}
               ></Button>
+              &nbsp;&nbsp;&nbsp;
+              <Button icon="import" type="primary" onClick={() => this.importModalVisible(this.props.projectid, true)} ></Button>
+              &nbsp;&nbsp;&nbsp;
+              <Button icon="export" type="primary" onClick={() =>this.excelPort()} ></Button>
             </span>
           </Col>
         </Row>
@@ -323,6 +344,12 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
+  changeImportStatus = (status: any) => {
+    this.setState({
+      importVisible: status,
+    });
+  };
+
   refreshNode = () => {
     this.getRoles(this.props.projectid);
   };
@@ -332,7 +359,7 @@ class TableList extends Component<TableListProps, TableListState> {
       listAndRoleList: { data },
       loading,
     } = this.props;
-    const { selectedRows, visible,updateModalVisible,viewModalVisible } = this.state;
+    const { selectedRows, visible,updateModalVisible,viewModalVisible,importVisible } = this.state;
     return (
       <div>
         角色信息
@@ -373,6 +400,12 @@ class TableList extends Component<TableListProps, TableListState> {
           roleCategory={this.state.roleCategory}
           viewModalVisible={viewModalVisible}
           status={this.changeViewStatus}
+        />
+        <Import
+          projectid={this.state.projectid}
+          importVisible={importVisible}
+          status={this.changeImportStatus}
+          refreshNode={this.refreshNode}
         />
       </div>
     );
