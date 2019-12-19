@@ -291,6 +291,11 @@ class TableList extends Component<TableListProps, TableListState> {
     location.href="/api/role/export?projectid="+projectid+"&roleDesc="+roleDesc+"";
   }
 
+  download = () => {
+    const url = "/api/role/downloadFile";
+    window.open(url)
+  }
+
   renderSimpleForm() {
     const { form } = this.props;
     const { getFieldDecorator } = form;
@@ -311,6 +316,8 @@ class TableList extends Component<TableListProps, TableListState> {
                 type="primary"
                 onClick={() => this.handleModalVisible(this.props.projectid, true)}
               ></Button>
+              &nbsp;&nbsp;&nbsp;
+              <Button icon="download" type="primary" onClick={() =>this.download()} ></Button>
               &nbsp;&nbsp;&nbsp;
               <Button icon="import" type="primary" onClick={() => this.importModalVisible(this.props.projectid, true)} ></Button>
               &nbsp;&nbsp;&nbsp;
