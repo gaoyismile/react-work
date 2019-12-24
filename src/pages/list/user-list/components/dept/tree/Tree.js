@@ -22,12 +22,11 @@ const TreeNodes = props => {
 
 const BranchNode = ({ branch, onNodeClick, treeNodes, level, render }) => {
   const { children, hidden = false, expanded = false } = branch || {};
-  //console.log("onNodeClick:",onNodeClick.id);
   if (hidden) return '';
   const isLeafNode = !children || children.length === 0;
   const iconClass = expanded ? 'icon-jiantou_xia' : 'icon-jiantou_you';
   return (
-    <li id="liRef" className={branch.id === 6 ? styles.treeLeafNode : ''}>
+    <li id="liRef">
       <span onClick={e => onNodeClick(e, branch)} className={styles.branchIconTextContainer}>
         {!isLeafNode && (
           <span>
@@ -44,9 +43,6 @@ const BranchNode = ({ branch, onNodeClick, treeNodes, level, render }) => {
         <ul>
           {children.map(item => {
             const newBranch = treeNodes[item];
-            branch.id === 6
-              ? (document.getElementById('liRef').style.backgroundColor = 'blanchedalmond')
-              : '1';
             if (!newBranch) return '';
             return (
               <BranchNode

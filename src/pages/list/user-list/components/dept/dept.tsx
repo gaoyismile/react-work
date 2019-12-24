@@ -18,12 +18,8 @@ import { StateType } from './model';
 import StandardTable, { StandardTableColumnProps } from '../StandardTable';
 import { TableListItem, TableListPagination, TableListParams } from './data';
 import Tree from './tree/Tree';
-import treeStyles from './tree/Tree.less';
-
-//import RoleList from './components/roleList';
 import styles from './style.less';
 
-const FormItem = Form.Item;
 const getValue = (obj: { [x: string]: string[] }) =>
   Object.keys(obj)
     .map(key => obj[key])
@@ -40,6 +36,11 @@ interface TableListProps extends FormComponentProps {
   >;
   loading: boolean;
   listAndUserDeptList: StateType;
+  userid:number;
+  onProjectRef(arg1: any):{};
+  refreshUser():{};
+  status(status: any):{};
+  deptModalVisible:boolean;
 }
 
 interface TableListState {
@@ -101,9 +102,11 @@ class TableList extends Component<TableListProps, TableListState> {
                     objectData: JSON.parse(datas)
                   });
               }
+              
           )
       });
       this.props.onProjectRef(this);
+      console.log("this.state.objectData",this.state.objectData);
   }
 
   getRestProjects= () =>{
@@ -199,39 +202,9 @@ class TableList extends Component<TableListProps, TableListState> {
     });
   };
 
-  renderSimpleForm() {
-    const { form } = this.props;
-    const { getFieldDecorator } = form;
-    return (
-      <Form onSubmit={this.handleSearch} layout="inline">
-        <Row gutter={24}>
-          <Col md={12} sm={24}>
-            <FormItem label="快速查询">
-              {getFieldDecorator('userName')(<Input placeholder="账号/用户姓名" />)}
-            </FormItem>
-          </Col>
-          <Col md={8} sm={24}>
-            <span className={styles.submitButtons}>
-              <Button type="primary" icon="search" htmlType="submit"/>
-              &nbsp;&nbsp;&nbsp;
-              <Button icon="plus" type="primary" onClick={() => this.handleModalVisible(true)}>
-              </Button>
-              &nbsp;&nbsp;&nbsp;
-              <Button icon="delete" type="primary" onClick={this.handleMenuClick} />
-            </span>
-          </Col>
-        </Row>
-      </Form>
-    );
-  }
-
-  renderForm() {
-    return this.renderSimpleForm();
-  }
-
-  onRef = (ref) => {
+  onRef = (ref: any) => {
     this.child = ref
-}
+  }
    // 选中行
    onClickRow = (record: { projectid: any; }) => {
     return {
@@ -247,10 +220,6 @@ class TableList extends Component<TableListProps, TableListState> {
   onNodeClick = (e: any, node: { id: any; name: any; }) => {
     console.info('TreeTest---onNodeClick---', node);
     this.setState({ deptid: node.id });
-    //node.id === 6 ? this.refs.clickNodeStyles.style.backgroundColor = 'blanchedalmond':'1';
-    // let className;
-    // node.id === 1 ? className = 'clickBackgroud':'1';
-    // return className;
   };
   
   handleCancel = () => {//点击取消
@@ -312,13 +281,9 @@ class TableList extends Component<TableListProps, TableListState> {
           </Card>
         </Col>
       <Col lg={16} md={24}>
-                {/* <RoleList 
-                  onRef={this.onRef}
-                  projectid={this.state.projectid}
-                /> */}
           <div ref='clickNodeStyles'>
             <Tree onNodeClick={this.onNodeClick.bind(this)} treeNodes={this.state.objectData} />
-          </div>    
+          </div>  
         </Col>
       </Row>
       </Modal>
